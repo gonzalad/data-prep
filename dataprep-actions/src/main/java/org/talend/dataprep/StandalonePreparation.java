@@ -15,13 +15,9 @@ package org.talend.dataprep;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.talend.dataprep.api.dataset.row.LightweightExportableDataSet;
 import org.talend.dataprep.api.preparation.PreparationMessage;
 import org.talend.dataquality.semantic.broadcast.BroadcastDocumentObject;
-
-import com.fasterxml.jackson.annotation.JsonRawValue;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class StandalonePreparation extends PreparationMessage {
 
@@ -31,8 +27,7 @@ public class StandalonePreparation extends PreparationMessage {
 
     private Map<String, LightweightExportableDataSet> lookupDataSets;
 
-    @JsonRawValue
-    private Object filterOut = "\"\"";
+    private String filterOut;
 
     public List<BroadcastDocumentObject> getDictionary() {
         return dictionary;
@@ -59,10 +54,10 @@ public class StandalonePreparation extends PreparationMessage {
     }
 
     public String getFilterOut() {
-        return filterOut == null ? StringUtils.EMPTY : filterOut.toString();
+        return filterOut;
     }
 
-    public void setFilterOut(ObjectNode filterOut) {
-        this.filterOut = filterOut.toString();
+    public void setFilterOut(String filterOut) {
+        this.filterOut = filterOut;
     }
 }

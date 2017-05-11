@@ -92,7 +92,7 @@ public class SimpleFilterService implements FilterService {
 
     @Override
     public Predicate<DataSetRow> build(String filterAsString, RowMetadata rowMetadata) {
-        if (isEmpty(filterAsString) || "\"\"".equals(filterAsString)) {
+        if (isEmpty(filterAsString)) {
             return r -> true;
         }
         try {
