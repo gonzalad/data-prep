@@ -18,6 +18,7 @@ class SearchDocumentationService {
 
 		this.searchDocumentationRestService = SearchDocumentationRestService;
 		this.textFormatService = TextFormatService;
+		this.domEl = document.createElement('p');
 	}
 
 	/**
@@ -79,9 +80,8 @@ class SearchDocumentationService {
 	 * @returns {String} readable string
 	 */
 	_convertHtmlSpecialCharacters(unreadableStr) {
-		const domEl = document.createElement('p');
-		domEl.innerHTML = unreadableStr;
-		return domEl.innerText;
+		this.domEl.innerHTML = unreadableStr;
+		return this.domEl.innerText;
 	}
 }
 
