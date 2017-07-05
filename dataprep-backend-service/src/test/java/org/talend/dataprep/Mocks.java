@@ -10,13 +10,17 @@
 //
 // ============================================================================
 
-package org.talend.dataprep.cache.file;
+package org.talend.dataprep;
 
-import org.springframework.test.context.TestPropertySource;
+import static org.mockito.Mockito.when;
 
-/**
- * Implementation of tests for local content cache.
- */
-@TestPropertySource(properties = { "content-service.store=local", "content-service.store.local.path=${java.io.tmpdir}/dataprep" })
-public class LocalContentCacheTest extends ResourceLoaderContentCacheTest {
+import org.talend.dataprep.api.service.info.VersionService;
+import org.talend.dataprep.info.Version;
+
+public class Mocks {
+
+    public static void configure(VersionService versionService) {
+        when(versionService.version()).thenReturn(new Version("0.0.0", "abdce"));
+    }
+
 }
