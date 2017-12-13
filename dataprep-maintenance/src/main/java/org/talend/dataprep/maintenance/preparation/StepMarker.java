@@ -18,6 +18,9 @@ public interface StepMarker {
      */
     Result mark(PreparationRepository repository, String marker);
 
+    /**
+     * The result of the mark operation as returned by {@link #mark(PreparationRepository, String)}.
+     */
     enum Result {
         /**
          * Mark operation is complete, cleaner may proceed with actual delete.
