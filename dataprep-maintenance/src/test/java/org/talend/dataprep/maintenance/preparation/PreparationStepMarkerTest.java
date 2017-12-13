@@ -25,8 +25,12 @@ public class PreparationStepMarkerTest {
         StepMarker marker = new PreparationStepMarker();
         PreparationRepository repository = mock(PreparationRepository.class);
         final Preparation preparation = new Preparation();
-        final Step step = new Step();
-        step.setId("1234");
+
+        final Step step = mock(Step.class);
+        when(step.id()).thenReturn("1234");
+        when(step.getParent()).thenReturn(Step.ROOT_STEP.id());
+        when(repository.get(eq("1234"), eq(Step.class))).thenReturn(step);
+
         preparation.setSteps(Arrays.asList(Step.ROOT_STEP, step));
         when(repository.list(eq(Preparation.class))).thenReturn(Stream.of(preparation));
 
@@ -35,10 +39,8 @@ public class PreparationStepMarkerTest {
 
         // Then
         assertEquals(StepMarker.Result.COMPLETED, result);
-        final Step expectedMarkedStep = new Step();
-        expectedMarkedStep.setId("1234");
-        expectedMarkedStep.setMarker("myMarker-1234");
-        verify(repository, times(1)).add(eq(Collections.singletonList(expectedMarkedStep)));
+        verify(repository, times(1)).add(eq(Collections.singletonList(step)));
+        verify(step, times(1)).setMarker(eq("myMarker-1234"));
     }
 
     @Test
