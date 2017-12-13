@@ -42,7 +42,7 @@ public class PreparationCleanerTest extends BaseMaintenanceTest {
     private PreparationRepository repository;
 
     @Mock
-    private OrphanStepMarker marker;
+    private StepMarker marker;
 
     @Test
     public void removeOrphanSteps_should_remove_orphan_step_after_at_least_X_hours() {
@@ -271,7 +271,7 @@ public class PreparationCleanerTest extends BaseMaintenanceTest {
     public void shouldInterruptWhenMarkerAsksForInterruption() {
         // given
         cleaner.setMarkers(Collections.singletonList(marker));
-        when(marker.mark(any(), anyString())).thenReturn(OrphanStepMarker.Result.INTERRUPTED);
+        when(marker.mark(any(), anyString())).thenReturn(StepMarker.Result.INTERRUPTED);
 
         // when
         cleaner.removeOrphanSteps();

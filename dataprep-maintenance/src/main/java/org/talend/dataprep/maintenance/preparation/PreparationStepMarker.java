@@ -18,9 +18,9 @@ import org.talend.tql.model.Expression;
 import org.talend.tql.parser.Tql;
 
 @Component
-public class PreparationOrphanStepMarker implements OrphanStepMarker {
+public class PreparationStepMarker implements StepMarker {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PreparationOrphanStepMarker.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PreparationStepMarker.class);
 
     @Override
     public Result mark(PreparationRepository repository, String marker) {

@@ -44,12 +44,12 @@ public class PreparationCleaner {
     private SecurityProxy securityProxy;
 
     @Autowired
-    private List<OrphanStepMarker> markers = new ArrayList<>();
+    private List<StepMarker> markers = new ArrayList<>();
 
     @Autowired
     private ForAll forAll;
 
-    void setMarkers(List<OrphanStepMarker> markers) {
+    void setMarkers(List<StepMarker> markers) {
         this.markers = markers;
     }
 
@@ -61,15 +61,15 @@ public class PreparationCleaner {
         final String currentCleanerRun = UUID.randomUUID().toString();
         try {
             LOGGER.info("Starting clean run '{}'", currentCleanerRun);
-            OrphanStepMarker.Result allMarkersResult = OrphanStepMarker.Result.COMPLETED;
-            for (OrphanStepMarker marker : markers) {
-                final OrphanStepMarker.Result result = marker.mark(repository, currentCleanerRun);
-                if (result == OrphanStepMarker.Result.INTERRUPTED) {
-                    allMarkersResult = OrphanStepMarker.Result.INTERRUPTED;
+            StepMarker.Result allMarkersResult = StepMarker.Result.COMPLETED;
+            for (StepMarker marker : markers) {
+                final StepMarker.Result result = marker.mark(repository, currentCleanerRun);
+                if (result == StepMarker.Result.INTERRUPTED) {
+                    allMarkersResult = StepMarker.Result.INTERRUPTED;
                 }
             }
 
-            if (allMarkersResult == OrphanStepMarker.Result.COMPLETED) {
+            if (allMarkersResult == StepMarker.Result.COMPLETED) {
                 LOGGER.info("Removing unused steps");
                 repository.remove(Step.class, Tql.parse("marker != '" + currentCleanerRun + "'"));
             } else {
