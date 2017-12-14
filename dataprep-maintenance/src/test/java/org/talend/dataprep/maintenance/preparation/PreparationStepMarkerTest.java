@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.talend.dataprep.api.preparation.Preparation;
 import org.talend.dataprep.api.preparation.Step;
@@ -71,6 +72,6 @@ public class PreparationStepMarkerTest {
 
         // Then
         assertEquals(StepMarker.Result.INTERRUPTED, result);
-        verify(repository, never()).add(any(Collection.class));
+        verify(repository, never()).add(Matchers.<Collection<Step>>any());
     }
 }
