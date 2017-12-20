@@ -63,6 +63,5 @@ describe('Actions suggestions-stats directive', () => {
 		//then
 		const elm = element.find('#actions-ghost');
 		expect(elm.length).toBe(1);
-		expect(elm.text().trim()).toBe(i18n.REFRESHING_WAIT);
 	}));
 });

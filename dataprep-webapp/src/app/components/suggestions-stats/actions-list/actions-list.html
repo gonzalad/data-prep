@@ -65,9 +65,8 @@
             <div ng-if="actionsListCtrl.showModalContent">
                 <div class="modal-subtitle">{{ actionsListCtrl.dynamicTransformation.description }}</div>
 
-                <div ng-if="actionsListCtrl.dynamicFetchInProgress">
-                    <i data-icon="c" class="icon continuous-rotate"></i>
-                </div>
+                <loader ng-if="actionsListCtrl.dynamicFetchInProgress"></loader>
+
                 <transform-form transformation="actionsListCtrl.dynamicTransformation"
                                 on-submit="actionsListCtrl.transform(actionsListCtrl.dynamicTransformation)(params)"></transform-form>
             </div>

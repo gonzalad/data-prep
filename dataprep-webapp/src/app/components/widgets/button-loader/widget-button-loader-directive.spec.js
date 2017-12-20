@@ -82,8 +82,9 @@ describe('Button Loader directive', function () {
         createElement();
 
         //then
-        expect(element.find('i').eq(0).hasClass('my-loading-class')).toBe(true);
-        expect(element.find('i').eq(0).hasClass('my-second-loading-class')).toBe(true);
+        const loaderElm = element.find('loader').eq(0);
+        expect(loaderElm.hasClass('my-loading-class')).toBeTruthy();
+        expect(loaderElm.hasClass('my-second-loading-class')).toBeTruthy();
     });
 
     it('should disable button', function () {
