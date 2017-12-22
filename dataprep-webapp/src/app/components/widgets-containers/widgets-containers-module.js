@@ -64,11 +64,11 @@ angular.module(MODULE_NAME,
 	.directive('pureSidePanel', ['reactDirective', reactDirective => reactDirective(
 		getTranslated(SidePanel, { i18n })
 	)])
+	.directive('pureLoader', ['reactDirective', reactDirective => reactDirective(Loader)])
 	.directive('pureProgress', ['reactDirective', reactDirective => reactDirective(Progress)])
 	.directive('iconsProvider', ['reactDirective', reactDirective => reactDirective(IconsProvider)])
 	.directive('icon', ['reactDirective', reactDirective => reactDirective(Icon)])
 	.directive('httpError', ['reactDirective', reactDirective => reactDirective(HttpError)])
-	.directive('loader', ['reactDirective', reactDirective => reactDirective(Loader)])
 	.directive('talendForm', ['reactDirective', reactDirective => reactDirective(
 		getTranslated(Form, { i18n })
 	)])

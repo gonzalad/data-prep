@@ -1,6 +1,6 @@
 /*  ============================================================================
 
-  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+  Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 
   This source code is available under agreement available at
   https://github.com/Talend/data-prep/blob/master/LICENSE
@@ -11,37 +11,15 @@
 
   ============================================================================*/
 
-.loading {
-	background: rgba(0, 0, 0, 0.3);
+loader {
+	display: block;
+	height: 100%;
+	width: 100%;
 
-	display: none;
-	opacity: 0;
-
-	align-items: center;
-	justify-content: center;
-
-	position: fixed;
-	left: 0;
-	top: 0;
-	right: 0;
-	bottom: 0;
-
-	height: 100vh;
-	width: 100vw;
-	z-index: 999999;
-
-	transition: opacity 0.2s ease;
-
-	svg circle {
-		stroke: white;
-	}
-}
-
-.show-loading {
-	overflow: hidden;
-
-	.loading {
+	.loader-wrapper {
 		display: flex;
-		opacity: 1;
+		justify-content: center;
+		align-items: center;
+		height: 100%;
 	}
 }

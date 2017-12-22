@@ -74,8 +74,6 @@
                 <div class="modal-subtitle">{{ actionsListCtrl.emptyParamsMsg | translate }}</div>
             </div>
         </div>
-        <div ng-switch-when="true" class="loader-container">
-            <loader />
-        </div>
+        <loader ng-switch-when="true"></loader>
     </talend-modal>
 </div>
