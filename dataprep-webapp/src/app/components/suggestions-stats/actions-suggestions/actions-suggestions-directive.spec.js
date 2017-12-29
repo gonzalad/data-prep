@@ -13,7 +13,6 @@
 
 const i18n = {
 	COLON: ': ',
-	REFRESHING_WAIT: 'Fetching, please wait…',
 };
 
 describe('Actions suggestions-stats directive', () => {

@@ -22,7 +22,7 @@ const BLOCKING_ACTION_TYPES = [
 
 export default class DatasetActionsService {
 	constructor($document, $stateParams, state, StateService, StorageService, DatasetService,
-	            ImportService, UploadWorkflowService, MessageService, TalendConfirmService) {
+				ImportService, UploadWorkflowService, MessageService, TalendConfirmService) {
 		'ngInject';
 		this.$document = $document;
 		this.$stateParams = $stateParams;
