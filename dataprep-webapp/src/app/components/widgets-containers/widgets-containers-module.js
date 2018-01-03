@@ -26,7 +26,7 @@ import Loader from '@talend/react-components/lib/Loader';
 import Progress from '@talend/react-components/lib/Progress';
 import Form from '@talend/react-forms';
 import getTranslated from '@talend/react-components/lib/TranslateWrapper';
-
+import Notifications from '@talend/react-components/lib/Notification';
 import { i18n } from './../../index-module';
 
 import AppHeaderBarContainer from './app-header-bar/app-header-bar-container';
@@ -35,6 +35,7 @@ import CollapsiblePanelContainer from './collapsible-panel/collapsible-panel-con
 import LayoutContainer from './layout/layout-container';
 import InventoryListContainer from './inventory-list/inventory-list-container';
 import SidePanelContainer from './side-panel/side-panel-container';
+import NotificationsContainer from './notifications/notifications-container';
 
 import SETTINGS_MODULE from '../../settings/settings-module';
 import STATE_MODULE from '../../services/state/state-module';
@@ -56,6 +57,7 @@ angular.module(MODULE_NAME,
 		getTranslated(AppHeaderBar, { i18n })
 	)])
 	.directive('pureBreadcrumb', ['reactDirective', reactDirective => reactDirective(Breadcrumbs)])
+	.directive('pureNotification', ['reactDirective', reactDirective => reactDirective(Notifications)])
 	.directive('pureCircularProgress', ['reactDirective', reactDirective => reactDirective(CircularProgress)])
 	.directive('pureCollapsiblePanel', ['reactDirective', reactDirective => reactDirective(CollapsiblePanel)])
 	.directive('pureList', ['reactDirective', reactDirective => reactDirective(
@@ -72,6 +74,7 @@ angular.module(MODULE_NAME,
 	.directive('talendForm', ['reactDirective', reactDirective => reactDirective(
 		getTranslated(Form, { i18n })
 	)])
+	.component('notifications', NotificationsContainer)
 	.component('appHeaderBar', AppHeaderBarContainer)
 	.component('breadcrumbs', BreadcrumbContainer)
 	.component('collapsiblePanel', CollapsiblePanelContainer)

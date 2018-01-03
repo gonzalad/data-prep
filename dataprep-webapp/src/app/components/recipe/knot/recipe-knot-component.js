@@ -52,7 +52,8 @@ const RecipeKnot = {
         aria-labelledby="{{ 'ENABLE_DISABLE_STEP' | translate }}"
         ng-click="$ctrl.toggleStep()"
         ng-mouseover="$ctrl.onHoverStart()"
-        ng-mouseleave="$ctrl.onHoverEnd()">
+        ng-mouseleave="$ctrl.onHoverEnd()"
+        title="{{ $ctrl.inactive ? 'ENABLE_STEP' : 'DISABLE_STEP' | translate }}">
             <div class="line" ng-class="{'no-line': !$ctrl.showTopLine}"></div>
             <div ng-if="$ctrl.inactive" class="circle inactive-knot" ng-class="{'to-be-activated': $ctrl.toBeSwitched}"></div>
             <div ng-if="!$ctrl.inactive" class="circle" ng-class="{'to-be-deactivated': $ctrl.toBeSwitched}"></div>
