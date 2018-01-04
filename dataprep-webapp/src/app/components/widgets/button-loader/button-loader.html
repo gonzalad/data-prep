@@ -13,9 +13,8 @@
   ~ ============================================================================
   -->
 
-<button class="talend-button-loader {{buttonLoaderCtrl.buttonClass}}"
-        ng-disabled="buttonLoaderCtrl.disableCondition"
-        ng-switch="!!buttonLoaderCtrl.loading">
-    <ng-transclude ng-switch-when="false"></ng-transclude>
-    <loader ng-switch-when="true" class="talend-button-loader-icon {{buttonLoaderCtrl.loadingClass}}"></loader>
-</button>
+<pure-action disabled="{{buttonLoaderCtrl.disableCondition}}"
+             in-progress="{{!!buttonLoaderCtrl.loading}}"
+             bs-style="'{{buttonLoaderCtrl.buttonClass.replace('btn-', '').replace('btn', '').trim()}}'"
+             label="'{{buttonLoaderCtrl.label}}'"
+             tooltip-label="'{{buttonLoaderCtrl.title || buttonLoaderCtrl.label}}'"/>

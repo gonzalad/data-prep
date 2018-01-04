@@ -35,12 +35,12 @@ export default function TalendButtonLoader() {
 	return {
 		restrict: 'E',
 		templateUrl: template,
-		transclude: true,
 		scope: {
 			buttonClass: '@',
-			disableCondition: '=',
-			loading: '=',
-			loadingClass: '@',
+			disableCondition: '<',
+			label: '@',
+			loading: '<',
+			tooltipLabel: '@title',
 		},
 		bindToController: true,
 		controller: () => {

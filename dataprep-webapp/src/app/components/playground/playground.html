@@ -134,9 +134,8 @@
                     button-class="btn modal-primary-button btn-primary {{playgroundCtrl.isSubmitDisabled() ? 'disabled' : ''}}"
                     disable-condition="playgroundCtrl.isSubmitDisabled()"
                     loading="playgroundCtrl.isSubmitLoading()"
-                    loading-class="icon"
-                                  title="{{(playgroundCtrl.isSubmitDisabled() ? 'WAITING_FOLDERS_TITLE' : 'SAVE_PREPARATION_TITLE') | translate}}">
-                <span translate-once="SAVE_IT"></span>
+                    title="{{(playgroundCtrl.isSubmitDisabled() ? 'WAITING_FOLDERS_TITLE' : 'SAVE_PREPARATION_TITLE') | translate}}"
+                    label="{{ 'SAVE_IT' | translate }}">
             </talend-button-loader>
         </div>
     </form>

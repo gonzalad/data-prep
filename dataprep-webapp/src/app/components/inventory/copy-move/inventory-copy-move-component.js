@@ -59,8 +59,8 @@ const InventoryCopyMoveComponent = {
                         loading="$ctrl.isMoving"
                         loading-class="icon"
                         ng-click="$ctrl.move()"
-                        title="{{($ctrl.isActionDisabled() ? 'WAITING_FOLDERS_TITLE' : 'MOVE_HERE_ACTION') | translate}}">
-                    <span translate-once="MOVE_HERE_ACTION"></span>
+                        title="{{($ctrl.isActionDisabled() ? 'WAITING_FOLDERS_TITLE' : 'MOVE_HERE_ACTION') | translate}}"
+                        label="{{ 'MOVE_HERE_ACTION' | translate }}">
                 </talend-button-loader>
 
                 <talend-button-loader
@@ -70,8 +70,8 @@ const InventoryCopyMoveComponent = {
                         loading="$ctrl.isCopying"
                         loading-class="icon"
                         ng-click="$ctrl.copy()"
-                        title="{{($ctrl.isActionDisabled() ? 'WAITING_FOLDERS_TITLE' : 'COPY_HERE_ACTION') | translate}}">
-                    <span translate-once="COPY_HERE_ACTION"></span>
+                        title="{{($ctrl.isActionDisabled() ? 'WAITING_FOLDERS_TITLE' : 'COPY_HERE_ACTION') | translate}}"
+                    	label="{{ 'COPY_HERE_ACTION' | translate }}">
                 </talend-button-loader>
             </div>
         </form>
