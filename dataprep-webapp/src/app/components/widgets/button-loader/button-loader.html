@@ -14,7 +14,8 @@
   -->
 
 <pure-action disabled="{{buttonLoaderCtrl.disableCondition}}"
-             in-progress="{{!!buttonLoaderCtrl.loading}}"
+             in-progress="!!buttonLoaderCtrl.loading"
              bs-style="'{{buttonLoaderCtrl.buttonClass.replace('btn-', '').replace('btn', '').trim()}}'"
              label="'{{buttonLoaderCtrl.label}}'"
+             on-click="buttonLoaderCtrl.onClick"
              tooltip-label="'{{buttonLoaderCtrl.title || buttonLoaderCtrl.label}}'"/>

@@ -39,13 +39,12 @@ export default function TalendButtonLoader() {
 			buttonClass: '@',
 			disableCondition: '<',
 			label: '@',
-			loading: '<',
+			loading: '=',
 			tooltipLabel: '@title',
+			onClick: '=',
 		},
 		bindToController: true,
-		controller: () => {
-		},
-
+		controller: () => {},
 		controllerAs: 'buttonLoaderCtrl',
 	};
 }
