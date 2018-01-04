@@ -37,7 +37,7 @@ export default function TalendButtonLoader() {
 		templateUrl: template,
 		scope: {
 			buttonClass: '@',
-			disableCondition: '<',
+			disableCondition: '=',
 			label: '@',
 			loading: '=',
 			tooltipLabel: '@title',
