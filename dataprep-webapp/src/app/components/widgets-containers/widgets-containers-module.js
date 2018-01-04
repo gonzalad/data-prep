@@ -54,7 +54,6 @@ angular.module(MODULE_NAME,
 		DATASET_UPLOAD_STATUS_MODULE,
 		STEP_PROGRESS_MODULE,
 	])
-	.directive('pureAction', ['reactDirective', reactDirective => reactDirective(ActionButton)])
 	.directive('pureAppHeaderBar', ['reactDirective', reactDirective => reactDirective(
 		getTranslated(AppHeaderBar, { i18n })
 	)])
@@ -71,6 +70,16 @@ angular.module(MODULE_NAME,
 	.directive('pureLoader', ['reactDirective', reactDirective => reactDirective(Loader)])
 	.directive('pureProgress', ['reactDirective', reactDirective => reactDirective(Progress)])
 	.directive('iconsProvider', ['reactDirective', reactDirective => reactDirective(IconsProvider)])
+	.directive('actionButton', ['reactDirective', reactDirective => reactDirective(ActionButton, [
+		'bsStyle',
+		'disabled',
+		'id',
+		'inProgress',
+		'label',
+		'onClick',
+		'tooltipLabel',
+		'type',
+	])])
 	.directive('icon', ['reactDirective', reactDirective => reactDirective(Icon)])
 	.directive('httpError', ['reactDirective', reactDirective => reactDirective(HttpError)])
 	.directive('talendForm', ['reactDirective', reactDirective => reactDirective(

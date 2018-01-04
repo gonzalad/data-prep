@@ -130,13 +130,13 @@
                     translate-once="NO_THANKS">
             </button>
 
-            <talend-button-loader
-                    button-class="btn modal-primary-button btn-primary {{playgroundCtrl.isSubmitDisabled() ? 'disabled' : ''}}"
-                    disable-condition="playgroundCtrl.isSubmitDisabled()"
-                    loading="playgroundCtrl.isSubmitLoading()"
-                    title="{{(playgroundCtrl.isSubmitDisabled() ? 'WAITING_FOLDERS_TITLE' : 'SAVE_PREPARATION_TITLE') | translate}}"
-                    label="{{ 'SAVE_IT' | translate }}">
-            </talend-button-loader>
+            <action-button bs-style="'primary'"
+                           type="'submit'"
+                           disabled="playgroundCtrl.isSubmitDisabled()"
+                           in-progress="playgroundCtrl.isSubmitLoading()"
+                           label="'{{ 'SAVE_IT' | translate }}'"
+                           title="'{{(playgroundCtrl.isSubmitDisabled() ? 'WAITING_FOLDERS_TITLE' : 'SAVE_PREPARATION_TITLE') | translate}}'"
+            ></action-button>
         </div>
     </form>
 </talend-modal>
