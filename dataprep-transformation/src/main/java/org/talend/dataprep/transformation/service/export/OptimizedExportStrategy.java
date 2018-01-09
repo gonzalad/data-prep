@@ -107,7 +107,7 @@ public class OptimizedExportStrategy extends BaseSampleExportStrategy {
 
             // get the actions to apply (no preparation ==> dataset export ==> no actions)
             final String actions = getActions(preparationId, previousVersion, version);
-            final PreparationMessage preparation = getPreparation(preparationId);
+            final PreparationMessage preparation = commandUtil.getPreparation(preparationId);
             preparation.setSteps(getMatchingSteps(preparation.getSteps(), previousVersion, version));
 
             LOGGER.debug("Running optimized strategy for preparation {} @ step #{}", preparationId, version);
@@ -211,7 +211,7 @@ public class OptimizedExportStrategy extends BaseSampleExportStrategy {
             this.preparationId = parameters.getPreparationId();
             this.sourceType = parameters.getFrom();
             if (preparationId != null) {
-                this.preparation = getPreparation(preparationId);
+                this.preparation = commandUtil.getPreparation(preparationId);
             } else {
                 preparation = null;
             }

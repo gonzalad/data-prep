@@ -45,6 +45,9 @@ import org.talend.dataprep.transformation.api.transformer.TransformerFactory;
 import org.talend.dataprep.transformation.format.FormatRegistrationService;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.talend.dataprep.transformation.util.CommandUtil;
+
+import javax.xml.ws.spi.WebServiceFeatureAnnotation;
 
 public abstract class BaseExportStrategy {
 
@@ -55,6 +58,9 @@ public abstract class BaseExportStrategy {
 
     @Autowired
     protected ObjectMapper mapper;
+
+    @Autowired
+    protected CommandUtil commandUtil;
 
     @Autowired
     protected ContentCache contentCache;
@@ -174,30 +180,6 @@ public abstract class BaseExportStrategy {
             }
         }
         return actions;
-    }
-
-    /**
-     * @param preparationId the wanted preparation id.
-     * @return the preparation out of its id.
-     */
-    protected PreparationMessage getPreparation(String preparationId) {
-        return getPreparation(preparationId, null);
-    }
-
-    /**
-     * @param preparationId the wanted preparation id.
-     * @param stepId the preparation step (might be different from head's to navigate through versions).
-     * @return the preparation out of its id.
-     */
-    protected PreparationMessage getPreparation(String preparationId, String stepId) {
-        final PreparationDetailsGet preparationDetailsGet = applicationContext.getBean(PreparationDetailsGet.class,
-                preparationId, stepId);
-        try (InputStream details = preparationDetailsGet.execute()) {
-            return mapper.readerFor(PreparationMessage.class).readValue(details);
-        } catch (Exception e) {
-            LOGGER.error("Unable to read preparation {}", preparationId, e);
-            throw new TDPException(UNABLE_TO_READ_PREPARATION, e, build().put("id", preparationId));
-        }
     }
 
 }

@@ -76,7 +76,7 @@ public class CachedExportStrategy extends BaseSampleExportStrategy {
     }
 
     private TransformationCacheKey getCacheKey(ExportParameters parameters) {
-        final PreparationMessage preparation = getPreparation(parameters.getPreparationId());
+        final PreparationMessage preparation = commandUtil.getPreparation(parameters.getPreparationId());
         return cacheKeyGenerator.generateContentKey(preparation.getDataSetId(), //
                 parameters.getPreparationId(), //
                 getCleanStepId(preparation, parameters.getStepId()), //

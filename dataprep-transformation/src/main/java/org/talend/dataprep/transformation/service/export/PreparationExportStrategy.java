@@ -83,7 +83,7 @@ public class PreparationExportStrategy extends BaseSampleExportStrategy {
         final String stepId = parameters.getStepId();
         final String preparationId = parameters.getPreparationId();
         final String formatName = parameters.getExportType();
-        final Preparation preparation = getPreparation(preparationId);
+        final Preparation preparation = commandUtil.getPreparation(preparationId);
         final String dataSetId = preparation.getDataSetId();
         final ExportFormat format = getFormat(parameters.getExportType());
 
@@ -117,8 +117,8 @@ public class PreparationExportStrategy extends BaseSampleExportStrategy {
                         parameters.getArguments(), //
                         parameters.getFilter() //
                 );
-                LOGGER.debug("Cache key: " + key.getKey());
-                LOGGER.debug("Cache key details: " + key.toString());
+                LOGGER.info("Cache key: " + key.getKey());
+                LOGGER.info("Cache key details: " + key.toString());
 
                 try (final TeeOutputStream tee = new TeeOutputStream(outputStream,
                         contentCache.put(key, ContentCache.TimeToLive.DEFAULT))) {
@@ -128,9 +128,11 @@ public class PreparationExportStrategy extends BaseSampleExportStrategy {
                             .sourceType(parameters.getFrom())
                             .format(format.getName()) //
                             .actions(actions) //
-                            .preparation(getPreparation(preparationId)) //
+                            .preparation(commandUtil.getPreparation(preparationId)) //
                             .stepId(version) //
                             .volume(Configuration.Volume.SMALL) //
+                            .globalStatistics(false)
+                            .allowMetadataChange(false)
                             .output(tee) //
                             .limit(limit) //
                             .build();

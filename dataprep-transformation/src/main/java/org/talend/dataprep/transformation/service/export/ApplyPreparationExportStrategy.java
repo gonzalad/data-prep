@@ -81,7 +81,7 @@ public class ApplyPreparationExportStrategy extends BaseSampleExportStrategy {
         final String stepId = parameters.getStepId();
         final String preparationId = parameters.getPreparationId();
         final String formatName = parameters.getExportType();
-        final Preparation preparation = getPreparation(preparationId);
+        final Preparation preparation = commandUtil.getPreparation(preparationId);
         final String dataSetId = parameters.getDatasetId();
         final ExportFormat format = getFormat(parameters.getExportType());
 
@@ -126,7 +126,7 @@ public class ApplyPreparationExportStrategy extends BaseSampleExportStrategy {
                         .outFilter(rm -> filterService.build(parameters.getFilter(), rm)) //
                         .sourceType(parameters.getFrom()).format(format.getName()) //
                         .actions(actions) //
-                        .preparation(getPreparation(preparationId)) //
+                        .preparation(commandUtil.getPreparation(preparationId)) //
                         .stepId(version) //
                         .volume(SMALL) //
                         .output(tee) //
