@@ -89,6 +89,7 @@ public class PipelineConsoleDump extends Visitor {
     @Override
     public void visitStepNode(StepNode stepNode) {
         builder.append("STEP NODE (").append(stepNode.getStep().toString()).append(")\n");
+        stepNode.getEntryNode().accept(this);
         super.visitStepNode(stepNode);
     }
 }
