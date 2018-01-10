@@ -17,10 +17,10 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.talend.dataprep.api.dataset.DataSet;
 import org.talend.dataprep.exception.TDPException;
+import org.talend.dataprep.services.api.AggregationOperation;
+import org.talend.dataprep.services.api.AggregationParameters;
+import org.talend.dataprep.services.api.Operator;
 import org.talend.dataprep.transformation.TransformationBaseTest;
-import org.talend.dataprep.transformation.aggregation.api.AggregationOperation;
-import org.talend.dataprep.transformation.aggregation.api.AggregationParameters;
-import org.talend.dataprep.transformation.aggregation.api.Operator;
 
 /**
  * Unit test for aggregation service.

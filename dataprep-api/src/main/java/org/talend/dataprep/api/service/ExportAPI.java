@@ -15,44 +15,36 @@ package org.talend.dataprep.api.service;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.talend.dataprep.command.CommandHelper.toStream;
 import static org.talend.dataprep.format.export.ExportFormat.PREFIX;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
 import javax.validation.Valid;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import org.talend.daikon.client.ClientService;
 import org.talend.dataprep.api.dataset.DataSetMetadata;
 import org.talend.dataprep.api.export.ExportParameters;
 import org.talend.dataprep.api.preparation.Preparation;
-import org.talend.dataprep.api.service.command.export.DataSetExportTypes;
-import org.talend.dataprep.api.service.command.export.Export;
-import org.talend.dataprep.api.service.command.export.ExportTypes;
-import org.talend.dataprep.api.service.command.export.PreparationExportTypes;
-import org.talend.dataprep.command.CommandHelper;
-import org.talend.dataprep.command.GenericCommand;
 import org.talend.dataprep.command.dataset.DataSetGetMetadata;
-import org.talend.dataprep.command.preparation.PreparationDetailsGet;
 import org.talend.dataprep.exception.TDPException;
 import org.talend.dataprep.exception.error.APIErrorCodes;
 import org.talend.dataprep.format.export.ExportFormat;
 import org.talend.dataprep.format.export.ExportFormatMessage;
 import org.talend.dataprep.http.HttpRequestContext;
 import org.talend.dataprep.metrics.Timed;
+import org.talend.dataprep.preparation.service.IPreparationService;
 import org.talend.dataprep.security.PublicAPI;
+import org.talend.dataprep.transformation.service.ITransformationService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -60,9 +52,12 @@ import io.swagger.annotations.ApiParam;
 @RestController
 public class ExportAPI extends APIService {
 
+    @Autowired
+    private ClientService clients;
+
     @RequestMapping(value = "/api/export", method = GET)
     @ApiOperation(value = "Export a dataset", consumes = APPLICATION_FORM_URLENCODED_VALUE, notes = "Export a dataset or a preparation to file. The file type is provided in the request body.")
-    public ResponseEntity<StreamingResponseBody> export(@ApiParam(value = "Export configuration") @Valid final ExportParameters parameters) {
+    public StreamingResponseBody export(@ApiParam(value = "Export configuration") @Valid final ExportParameters parameters) {
         try {
             Map<String, String> arguments = new HashMap<>();
             final Enumeration<String> names = HttpRequestContext.parameters();
@@ -79,8 +74,7 @@ public class ExportAPI extends APIService {
 
             LOG.info("New Export {}", parameters);
 
-            final GenericCommand<InputStream> command = getCommand(Export.class, parameters);
-            return CommandHelper.toStreaming(command);
+            return clients.of(ITransformationService.class).execute(parameters);
         } catch (TDPException e) {
             throw e;
         } catch (Exception e) {
@@ -100,18 +94,13 @@ public class ExportAPI extends APIService {
 
         // deal with preparation (update the export name and dataset id if needed)
         if (StringUtils.isNotBlank(parameters.getPreparationId())) {
-            final PreparationDetailsGet preparationDetailsGet = getCommand(PreparationDetailsGet.class, parameters.getPreparationId());
-            try (InputStream details = preparationDetailsGet.execute()) {
-                final Preparation preparation = mapper.readerFor(Preparation.class).readValue(details);
-                if (StringUtils.isBlank(exportName)) {
-                    exportName = preparation.getName();
-                }
-                // update the dataset id in the parameters if needed
-                if (StringUtils.isBlank(parameters.getDatasetId())) {
-                    parameters.setDatasetId(preparation.getDataSetId());
-                }
-            } catch (IOException e) {
-                LOG.warn("unable to get the preparation to for the export", e);
+            final Preparation preparation = clients.of(IPreparationService.class).getPreparation(parameters.getPreparationId());
+            if (StringUtils.isBlank(exportName)) {
+                exportName = preparation.getName();
+            }
+            // update the dataset id in the parameters if needed
+            if (StringUtils.isBlank(parameters.getDatasetId())) {
+                parameters.setDatasetId(preparation.getDataSetId());
             }
         } else if (StringUtils.isBlank(exportName)){
             // deal export name in case of dataset
@@ -129,8 +118,8 @@ public class ExportAPI extends APIService {
     @ApiOperation(value = "Get the available format types")
     @Timed
     @PublicAPI
-    public Callable<Stream<ExportFormatMessage>> exportTypes() {
-        return () -> toStream(ExportFormatMessage.class, mapper, getCommand(ExportTypes.class));
+    public Stream<ExportFormatMessage> exportTypes() {
+        return clients.of(ITransformationService.class).exportTypes();
     }
 
     /**
@@ -139,8 +128,8 @@ public class ExportAPI extends APIService {
     @RequestMapping(value = "/api/export/formats/preparations/{preparationId}", method = GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get the available format types for preparation.")
     @Timed
-    public Callable<Stream<ExportFormatMessage>> exportTypesForPreparation(@PathVariable("preparationId") String preparationId) {
-        return () -> toStream(ExportFormatMessage.class, mapper, getCommand(PreparationExportTypes.class, preparationId));
+    public Stream<ExportFormatMessage> exportTypesForPreparation(@PathVariable("preparationId") String preparationId) {
+        return clients.of(ITransformationService.class).getPreparationExportTypesForPreparation(preparationId);
     }
 
     /**
@@ -149,7 +138,7 @@ public class ExportAPI extends APIService {
     @RequestMapping(value = "/api/export/formats/datasets/{dataSetId}", method = GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get the available format types for preparation.")
     @Timed
-    public Callable<Stream<ExportFormatMessage>> exportTypesForDataSet(@PathVariable("dataSetId") String dataSetId) {
-        return () -> toStream(ExportFormatMessage.class, mapper, getCommand(DataSetExportTypes.class, dataSetId));
+    public Stream<ExportFormatMessage> exportTypesForDataSet(@PathVariable("dataSetId") String dataSetId) {
+        return clients.of(ITransformationService.class).getPreparationExportTypesForDataSet(dataSetId);
     }
 }

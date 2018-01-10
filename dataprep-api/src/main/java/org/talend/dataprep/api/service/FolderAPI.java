@@ -13,9 +13,7 @@
 package org.talend.dataprep.api.service;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.PUT;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 import static org.talend.daikon.exception.ExceptionContext.build;
 import static org.talend.dataprep.command.CommandHelper.toPublisher;
 
@@ -23,25 +21,20 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import org.talend.daikon.client.ClientService;
 import org.talend.dataprep.api.folder.Folder;
+import org.talend.dataprep.api.folder.FolderInfo;
+import org.talend.dataprep.api.folder.FolderTreeNode;
 import org.talend.dataprep.api.service.api.EnrichedPreparation;
-import org.talend.dataprep.api.service.command.folder.CreateChildFolder;
-import org.talend.dataprep.api.service.command.folder.FolderChildrenList;
-import org.talend.dataprep.api.service.command.folder.FolderTree;
-import org.talend.dataprep.api.service.command.folder.GetFolder;
 import org.talend.dataprep.api.service.command.folder.RemoveFolder;
 import org.talend.dataprep.api.service.command.folder.RenameFolder;
 import org.talend.dataprep.api.service.command.folder.SearchFolders;
@@ -52,6 +45,7 @@ import org.talend.dataprep.dataset.DataSetMetadataBuilder;
 import org.talend.dataprep.exception.TDPException;
 import org.talend.dataprep.exception.error.APIErrorCodes;
 import org.talend.dataprep.metrics.Timed;
+import org.talend.dataprep.preparation.service.IFolderService;
 import org.talend.dataprep.preparation.service.UserPreparation;
 import org.talend.dataprep.security.SecurityProxy;
 import org.talend.dataprep.util.SortAndOrderHelper.Order;
@@ -68,6 +62,9 @@ import reactor.core.publisher.Flux;
 public class FolderAPI extends APIService {
 
     @Autowired
+    private ClientService clients;
+
+    @Autowired
     private DataSetMetadataBuilder metadataBuilder;
 
     /** Security proxy let the current thread to borrow another identity for a while. */
@@ -77,10 +74,9 @@ public class FolderAPI extends APIService {
     @RequestMapping(value = "/api/folders", method = GET)
     @ApiOperation(value = "List folders. Optional filter on parent ID may be supplied.", produces = APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<StreamingResponseBody> listFolders(@RequestParam(required = false) String parentId) {
+    public Stream<Folder> listFolders(@RequestParam(required = false) String parentId) {
         try {
-            final GenericCommand<InputStream> foldersList = getCommand(FolderChildrenList.class, parentId);
-            return CommandHelper.toStreaming(foldersList);
+            return clients.of(IFolderService.class).list(parentId, Sort.LAST_MODIFICATION_DATE, Order.DESC);
         } catch (Exception e) {
             throw new TDPException(APIErrorCodes.UNABLE_TO_LIST_FOLDERS, e);
         }
@@ -89,10 +85,9 @@ public class FolderAPI extends APIService {
     @RequestMapping(value = "/api/folders/tree", method = GET)
     @ApiOperation(value = "List all folders", produces = APPLICATION_JSON_VALUE)
     @Timed
-    public StreamingResponseBody getTree() {
+    public FolderTreeNode getTree() {
         try {
-            final HystrixCommand<InputStream> foldersList = getCommand(FolderTree.class);
-            return CommandHelper.toStreaming(foldersList);
+            return clients.of(IFolderService.class).getTree();
         } catch (Exception e) {
             throw new TDPException(APIErrorCodes.UNABLE_TO_LIST_FOLDERS, e);
         }
@@ -101,10 +96,9 @@ public class FolderAPI extends APIService {
     @RequestMapping(value = "/api/folders/{id}", method = GET, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get folder by id", produces = APPLICATION_JSON_VALUE, notes = "Get a folder by id")
     @Timed
-    public StreamingResponseBody getFolderAndHierarchyById(@PathVariable(value = "id") final String id) {
+    public FolderInfo getFolderAndHierarchyById(@PathVariable(value = "id") final String id) {
         try {
-            final HystrixCommand<InputStream> foldersList = getCommand(GetFolder.class, id);
-            return CommandHelper.toStreaming(foldersList);
+            return clients.of(IFolderService.class).getFolderAndHierarchyById(id);
         } catch (Exception e) {
             throw new TDPException(APIErrorCodes.UNABLE_TO_GET_FOLDERS, e);
         }
@@ -115,8 +109,7 @@ public class FolderAPI extends APIService {
     @Timed
     public StreamingResponseBody addFolder(@RequestParam(required = false) final String parentId, @RequestParam final String path) {
         try {
-            final HystrixCommand<InputStream> createChildFolder = getCommand(CreateChildFolder.class, parentId, path);
-            return CommandHelper.toStreaming(createChildFolder);
+            return clients.of(IFolderService.class).addFolder(parentId, path);
         } catch (Exception e) {
             throw new TDPException(APIErrorCodes.UNABLE_TO_CREATE_FOLDER, e);
         }
@@ -199,8 +192,7 @@ public class FolderAPI extends APIService {
             try (final JsonGenerator generator = mapper.getFactory().createGenerator(output)) {
                 generator.writeStartObject();
                 // Folder list
-                final FolderChildrenList commandListFolders = getCommand(FolderChildrenList.class, id, sort, order);
-                final Flux<Folder> folders = Flux.from(toPublisher(Folder.class, mapper, commandListFolders));
+                final Stream<Folder> folders = clients.of(IFolderService.class).list(id, sort, order);
                 writeFluxToJsonArray(folders, "folders", generator);
                 // Preparation list
                 final PreparationListByFolder listPreparations = getCommand(PreparationListByFolder.class, id, sort, order);

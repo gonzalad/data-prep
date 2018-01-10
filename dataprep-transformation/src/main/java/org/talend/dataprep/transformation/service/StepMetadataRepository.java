@@ -17,9 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.talend.daikon.client.ClientService;
 import org.talend.dataprep.api.dataset.RowMetadata;
-import org.talend.dataprep.command.preparation.GetStepRowMetadata;
-import org.talend.dataprep.command.preparation.UpdateStepRowMetadata;
+import org.talend.dataprep.preparation.service.IPreparationService;
 
 /**
  * This service provides operation to update a preparation in preparation service. This is useful when transformation
@@ -27,6 +27,9 @@ import org.talend.dataprep.command.preparation.UpdateStepRowMetadata;
  */
 @Service
 public class StepMetadataRepository {
+
+    @Autowired
+    private ClientService clients;
 
     /**
      * This class' logger.
@@ -43,7 +46,7 @@ public class StepMetadataRepository {
      */
     public RowMetadata get(String stepId) {
         LOGGER.debug("getting step {} metadata", stepId);
-        return context.getBean(GetStepRowMetadata.class, stepId).execute();
+        return clients.of(IPreparationService.class).getPreparationStep(stepId);
     }
 
     /**
@@ -54,6 +57,6 @@ public class StepMetadataRepository {
      */
     public void update(String stepId, RowMetadata rowMetadata) {
         LOGGER.debug("updating step {} metadata", stepId);
-        context.getBean(UpdateStepRowMetadata.class, stepId, rowMetadata).execute();
+        clients.of(IPreparationService.class).updatePreparationStep(stepId, rowMetadata);
     }
 }

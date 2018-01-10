@@ -25,7 +25,7 @@ import java.time.Instant;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.talend.dataprep.transformation.aggregation.api.AggregationParameters;
+import org.talend.dataprep.services.api.AggregationParameters;
 
 import com.jayway.restassured.response.Response;
 

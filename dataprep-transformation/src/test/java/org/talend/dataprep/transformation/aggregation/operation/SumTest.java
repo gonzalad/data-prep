@@ -15,8 +15,8 @@ package org.talend.dataprep.transformation.aggregation.operation;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.talend.dataprep.services.api.Operator;
 import org.talend.dataprep.transformation.aggregation.api.AggregationResult;
-import org.talend.dataprep.transformation.aggregation.api.Operator;
 
 /**
  * Unit test for Sum aggregator.

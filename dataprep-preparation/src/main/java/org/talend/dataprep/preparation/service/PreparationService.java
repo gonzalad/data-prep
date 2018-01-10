@@ -41,7 +41,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.dataprep.api.action.ActionDefinition;
 import org.talend.dataprep.api.dataset.DataSetMetadata;
@@ -70,8 +70,8 @@ import org.talend.dataprep.util.SortAndOrderHelper.Sort;
 import org.talend.tql.api.TqlBuilder;
 import org.talend.tql.model.Expression;
 
-@Service
-public class PreparationService {
+@ServiceImplementation
+public class PreparationService implements IPreparationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreparationService.class);
 
@@ -136,13 +136,7 @@ public class PreparationService {
     @Autowired
     private Set<Validator> validators;
 
-    /**
-     * Create a preparation from the http request body.
-     *
-     * @param preparation the preparation to create.
-     * @param folderId where to store the preparation.
-     * @return the created preparation id.
-     */
+    @Override
     public String create(final Preparation preparation, String folderId) {
         LOGGER.debug("Create new preparation for data set {} in {}", preparation.getDataSetId(), folderId);
 
@@ -165,16 +159,7 @@ public class PreparationService {
         return id;
     }
 
-    /**
-     * List all preparation details.
-     *
-     * @param name of the preparation.
-     * @param folderPath filter on the preparation path.
-     * @param path preparation full path in the form folder_path/preparation_name. Overrides folderPath and name if present.
-     * @param sort how to sort the preparations.
-     * @param order how to order the sort.
-     * @return the preparation details.
-     */
+    @Override
     public Stream<UserPreparation> listAll(String name, String folderPath, String path, Sort sort, Order order) {
         if (path != null) {
             // Transform path argument into folder path + preparation name
@@ -201,7 +186,7 @@ public class PreparationService {
         return listAll(filterPreparation().byName(name).withNameExactMatch(true).byFolderPath(folderPath), sort, order);
     }
 
-    public Stream<UserPreparation> listAll(PreparationSearchCriterion searchCriterion, Sort sort, Order order) {
+    private Stream<UserPreparation> listAll(PreparationSearchCriterion searchCriterion, Sort sort, Order order) {
         LOGGER.debug("Get list of preparations (with details).");
         Stream<Preparation> preparationStream;
 
@@ -238,39 +223,14 @@ public class PreparationService {
                 .sorted(getPreparationComparator(sort, order, p -> getDatasetMetadata(p.getDataSetId())));
     }
 
-    /**
-     * List all preparation summaries.
-     *
-     * @return the preparation summaries, sorted by descending last modification date.
-     */
+    @Override
     public Stream<PreparationSummary> listSummary(String name, String folderPath, String path, Sort sort, Order order) {
         return listAll(name, folderPath, path, sort, order).map(p -> beanConversionService.convert(p, PreparationSummary.class));
     }
 
-    /**
-     * <p>
-     * Search preparation entry point.
-     * </p>
-     * <p>
-     * <p>
-     * So far at least one search criteria can be processed at a time among the following ones :
-     * <ul>
-     * <li>dataset id</li>
-     * <li>preparation name & exact match</li>
-     * <li>folderId path</li>
-     * </ul>
-     * </p>
-     *
-     * @param dataSetId to search all preparations based on this dataset id.
-     * @param folderId to search all preparations located in this folderId.
-     * @param name to search all preparations that match this name.
-     * @param exactMatch if true, the name matching must be exact.
-     * @param path
-     * @param sort Sort key (by name, creation date or modification date).
-     * @param order Order for sort key (desc or asc).
-     */
+    @Override
     public Stream<UserPreparation> searchPreparations(String dataSetId, String folderId, String name, boolean exactMatch,
-            String path, Sort sort, Order order) {
+                                                      String path, Sort sort, Order order) {
         return listAll( //
                 filterPreparation() //
                         .byDataSetId(dataSetId) //
@@ -301,13 +261,7 @@ public class PreparationService {
         return match("name", regex);
     }
 
-    /**
-     * Copy the given preparation to the given name / folder ans returns the new if in the response.
-     *
-     * @param name the name of the copied preparation, if empty, the name is "orginal-preparation-name Copy"
-     * @param destination the folder path where to copy the preparation, if empty, the copy is in the same folder.
-     * @return The new preparation id.
-     */
+    @Override
     public String copy(String preparationId, String name, String destination) {
 
         LOGGER.debug("copy {} to folder {} with {} as new name");
@@ -409,13 +363,7 @@ public class PreparationService {
         }
     }
 
-    /**
-     * Move a preparation to an other folder.
-     *
-     * @param folder The original folder of the preparation.
-     * @param destination The new folder of the preparation.
-     * @param newName The new preparation name.
-     */
+    @Override
     public void move(String preparationId, String folder, String destination, String newName) {
         //@formatter:on
 
@@ -447,11 +395,7 @@ public class PreparationService {
         }
     }
 
-    /**
-     * Delete the preparation that match the given id.
-     *
-     * @param preparationId the preparation id to delete.
-     */
+    @Override
     public void delete(String preparationId) {
 
         LOGGER.debug("Deletion of preparation #{} requested.", preparationId);
@@ -493,13 +437,7 @@ public class PreparationService {
         }
     }
 
-    /**
-     * Update a preparation.
-     *
-     * @param preparationId the preparation id to update.
-     * @param preparation the updated preparation.
-     * @return the updated preparation id.
-     */
+    @Override
     public String update(String preparationId, final Preparation preparation) {
         final Preparation previousPreparation = lockPreparation(preparationId);
 
@@ -532,14 +470,7 @@ public class PreparationService {
         }
     }
 
-    /**
-     * Copy the steps from the another preparation to this one.
-     * <p>
-     * This is only allowed if this preparation has no steps.
-     *
-     * @param id the preparation id to update.
-     * @param from the preparation id to copy the steps from.
-     */
+    @Override
     public void copyStepsFrom(String id, String from) {
 
         LOGGER.debug("copy steps from {} to {}", from, id);
@@ -569,13 +500,7 @@ public class PreparationService {
         LOGGER.info("clone steps from {} to {} done --> {}", from, id, preparationToUpdate);
     }
 
-    /**
-     * Return a preparation details.
-     *
-     * @param id the wanted preparation id.
-     * @param stepId the optional step id.
-     * @return the preparation details.
-     */
+    @Override
     public PreparationMessage getPreparationDetails(String id, String stepId) {
         LOGGER.debug("Get content of preparation details for #{}.", id);
         final Preparation preparation = preparationRepository.get(id, Preparation.class);
@@ -635,12 +560,7 @@ public class PreparationService {
         }
     }
 
-    /**
-     * Return the folder that holds this preparation.
-     *
-     * @param id the wanted preparation id.
-     * @return the folder that holds this preparation.
-     */
+    @Override
     public Folder searchLocation(String id) {
 
         LOGGER.debug("looking the folder for {}", id);
@@ -655,13 +575,15 @@ public class PreparationService {
         return folder;
     }
 
+    @Override
     public List<String> getSteps(String id) {
         LOGGER.debug("Get steps of preparation for #{}.", id);
         final Step step = getStep(id);
         return preparationUtils.listStepsIds(step.id(), preparationRepository);
     }
 
-    public void addPreparationAction(final String preparationId, final AppendStep step) {
+    @Override
+    public void addPreparationAction(final String preparationId, final List<AppendStep> step) {
         LOGGER.debug("Adding action to preparation...");
         Preparation preparation = getPreparation(preparationId);
         List<Action> actions = getVersionedAction(preparationId, "head");
@@ -688,10 +610,7 @@ public class PreparationService {
         return builtActions;
     }
 
-    /**
-     * Append step(s) in a preparation.
-     */
-    public void appendSteps(String preparationId, final List<AppendStep> stepsToAppend) {
+    private void appendSteps(String preparationId, final List<AppendStep> stepsToAppend) {
         stepsToAppend.forEach(this::checkActionStepConsistency);
 
         LOGGER.debug("Adding actions to preparation #{}", preparationId);
@@ -708,18 +627,7 @@ public class PreparationService {
         }
     }
 
-    /**
-     * Update a step in a preparation <b>Strategy</b><br/>
-     * The goal here is to rewrite the preparation history from 'the step to modify' (STM) to the head, with STM
-     * containing the new action.<br/>
-     * <ul>
-     * <li>1. Extract the actions from STM (excluded) to the head</li>
-     * <li>2. Insert the new actions before the other extracted actions. The actions list contains all the actions from
-     * the <b>NEW</b> STM to the head</li>
-     * <li>3. Set preparation head to STM's parent, so STM will be excluded</li>
-     * <li>4. Append each action (one step is created by action) after the new preparation head</li>
-     * </ul>
-     */
+    @Override
     public void updateAction(final String preparationId, final String stepToModifyId, final AppendStep newStep) {
         checkActionStepConsistency(newStep);
         LOGGER.debug("Modifying actions in preparation #{}", preparationId);
@@ -759,24 +667,7 @@ public class PreparationService {
         }
     }
 
-    /**
-     * Delete a step in a preparation.<br/>
-     * STD : Step To Delete <br/>
-     * <br/>
-     * <ul>
-     * <li>1. Extract the actions from STD (excluded) to the head. The actions list contains all the actions from the
-     * STD's child to the head.</li>
-     * <li>2. Filter the preparations that apply on a column created by the step to delete. Those steps will be removed
-     * too.</li>
-     * <li>2bis. Change the actions that apply on columns > STD last created column id. The created columns ids after
-     * the STD are shifted.</li>
-     * <li>3. Set preparation head to STD's parent, so STD will be excluded</li>
-     * <li>4. Append each action after the new preparation head</li>
-     * </ul>
-     *
-     * @param id the preparation id.
-     * @param stepToDeleteId the step id to delete.
-     */
+    @Override
     public void deleteAction(final String id, final String stepToDeleteId) {
         if (Step.ROOT_STEP.getId().equals(stepToDeleteId)) {
             throw new TDPException(PREPARATION_ROOT_STEP_CANNOT_BE_DELETED);
@@ -791,6 +682,7 @@ public class PreparationService {
 
     }
 
+    @Override
     public void setPreparationHead(final String preparationId, final String headId) {
         final Step head = getStep(headId);
         if (head == null) {
@@ -805,13 +697,7 @@ public class PreparationService {
         }
     }
 
-    /**
-     * Get all the actions of a preparation at given version.
-     *
-     * @param id the wanted preparation id.
-     * @param version the wanted preparation version.
-     * @return the list of actions.
-     */
+    @Override
     public List<Action> getVersionedAction(final String id, final String version) {
         LOGGER.debug("Get list of actions of preparation #{} at version {}.", id, version);
 
@@ -829,9 +715,7 @@ public class PreparationService {
         }
     }
 
-    /**
-     * List all preparation related error codes.
-     */
+    @Override
     public Iterable<JsonErrorCodeDescription> listErrors() {
         // need to cast the typed dataset errors into mock ones to use json parsing
         List<JsonErrorCodeDescription> errors = new ArrayList<>(PreparationErrorCodes.values().length);
@@ -841,6 +725,7 @@ public class PreparationService {
         return errors;
     }
 
+    @Override
     public boolean isDatasetUsedInPreparation(final String datasetId) {
         final boolean preparationUseDataSet = isDatasetBaseOfPreparation(datasetId);
         final boolean dataSetUsedInLookup = isDatasetUsedToLookupInPreparationHead(datasetId);
@@ -859,14 +744,7 @@ public class PreparationService {
                 .anyMatch(a -> Objects.equals(datasetId, a.getParameters().get(datasetParamName)));
     }
 
-    /**
-     * Moves the step with specified <i>stepId</i> just after the step with <i>parentStepId</i> as identifier within the specified
-     * preparation.
-     *
-     * @param preparationId the id of the preparation containing the step to move
-     * @param stepId the id of the step to move
-     * @param parentStepId the id of the step which wanted as the parent of the step to move
-     */
+    @Override
     public void moveStep(final String preparationId, String stepId, String parentStepId) {
         LOGGER.debug("Moving step {} after step {}, within preparation {}", stepId, parentStepId, preparationId);
         final Preparation preparation = lockPreparation(preparationId);
@@ -916,24 +794,12 @@ public class PreparationService {
         }
     }
 
-    /**
-     * Get the step from id
-     *
-     * @param stepId The step id
-     * @return The step with the provided id, might return <code>null</code> is step does not exist.
-     * @see PreparationRepository#get(String, Class)
-     */
+    @Override
     public Step getStep(final String stepId) {
         return preparationRepository.get(stepId, Step.class);
     }
 
-    /**
-     * Get preparation from id with null result check.
-     *
-     * @param preparationId The preparation id.
-     * @return The preparation with the provided id
-     * @throws TDPException when no preparation has the provided id
-     */
+    @Override
     public Preparation getPreparation(final String preparationId) {
         final Preparation preparation = preparationRepository.get(preparationId, Preparation.class);
         if (preparation == null) {
@@ -995,24 +861,12 @@ public class PreparationService {
         return steps;
     }
 
-    /**
-     * Marks the specified preparation (identified by <i>preparationId</i>) as locked by the user identified by the
-     * specified user (identified by <i>userId</i>).
-     *
-     * @param preparationId the specified preparation identifier
-     * @throws TDPException if the lock is hold by another user
-     */
+    @Override
     public Preparation lockPreparation(String preparationId) {
         return lockedResourceRepository.tryLock(preparationId, security.getUserId(), security.getUserDisplayName());
     }
 
-    /**
-     * Marks the specified preparation (identified by <i>preparationId</i>) as unlocked by the user identified by the
-     * specified user (identified by <i>userId</i>).
-     *
-     * @param preparationId the specified preparation identifier
-     * @throws TDPException if the lock is hold by another user
-     */
+    @Override
     public void unlockPreparation(String preparationId) {
         lockedResourceRepository.unlock(preparationId, security.getUserId());
     }
@@ -1304,6 +1158,7 @@ public class PreparationService {
         }
     }
 
+    @Override
     public void updatePreparationStep(String stepId, RowMetadata rowMetadata) {
         final Step step = preparationRepository.get(stepId, Step.class);
 
@@ -1320,6 +1175,7 @@ public class PreparationService {
         preparationRepository.add(step);
     }
 
+    @Override
     public RowMetadata getPreparationStep(String stepId) {
         final Step step = preparationRepository.get(stepId, Step.class);
         if (step != null) {

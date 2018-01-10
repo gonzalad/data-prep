@@ -25,17 +25,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import org.talend.daikon.client.ClientService;
 import org.talend.dataprep.api.dataset.DataSetMetadata;
 import org.talend.dataprep.api.dataset.Import;
 import org.talend.dataprep.api.dataset.statistics.SemanticDomain;
 import org.talend.dataprep.api.preparation.Preparation;
 import org.talend.dataprep.api.service.api.EnrichedDataSetMetadata;
 import org.talend.dataprep.api.service.command.dataset.*;
-import org.talend.dataprep.api.service.command.preparation.PreparationList;
 import org.talend.dataprep.api.service.command.preparation.PreparationSearchByDataSetId;
 import org.talend.dataprep.api.service.command.transformation.SuggestDataSetActions;
 import org.talend.dataprep.api.service.command.transformation.SuggestLookupActions;
@@ -46,8 +47,9 @@ import org.talend.dataprep.command.dataset.DataSetGetMetadata;
 import org.talend.dataprep.dataset.service.UserDataSetMetadata;
 import org.talend.dataprep.http.HttpResponseContext;
 import org.talend.dataprep.metrics.Timed;
+import org.talend.dataprep.preparation.service.IPreparationService;
+import org.talend.dataprep.preparation.service.UserPreparation;
 import org.talend.dataprep.security.PublicAPI;
-import org.talend.dataprep.util.SortAndOrderHelper;
 import org.talend.dataprep.util.SortAndOrderHelper.Order;
 import org.talend.dataprep.util.SortAndOrderHelper.Sort;
 
@@ -60,6 +62,9 @@ import reactor.core.publisher.Mono;
 
 @RestController
 public class DataSetAPI extends APIService {
+
+    @Autowired
+    private ClientService clients;
 
     /**
      * Create a dataset from request body content.
@@ -330,7 +335,7 @@ public class DataSetAPI extends APIService {
     @RequestMapping(value = "/api/datasets/{id}/compatiblepreparations", method = GET, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "List compatible preparations.", produces = APPLICATION_JSON_VALUE, notes = "Returns a list of data sets that are compatible with the specified one.")
     @Timed
-    public Callable<Stream<Preparation>> listCompatiblePreparations(
+    public Callable<Stream<UserPreparation>> listCompatiblePreparations(
             @ApiParam(value = "Id of the data set to get") @PathVariable(value = "id") String dataSetId,
             @ApiParam(value = "Sort key (by name or date), defaults to 'modification'.") @RequestParam(defaultValue = "lastModificationDate") Sort sort,
             @ApiParam(value = "Order for sort key (desc or asc), defaults to 'desc'.") @RequestParam(defaultValue = "desc") Order order) {
@@ -345,14 +350,12 @@ public class DataSetAPI extends APIService {
                     .collectList() //
                     .cache(); // Keep it in cache for later reuse
             // get list of preparations
-            GenericCommand<InputStream> preparationList = getCommand(PreparationList.class, SortAndOrderHelper.Format.LONG, sort, order);
-            return Flux.from(toPublisher(Preparation.class, mapper, preparationList)) //
-                    .filter(p -> compatibleList.flatMapIterable(l -> l) //
+            final Stream<UserPreparation> stream = clients.of(IPreparationService.class).listAll("", "", "", sort, order);
+            return stream.filter(p -> compatibleList.flatMapIterable(l -> l) //
                             .map(DataSetMetadata::getId) //
                             .any(id -> StringUtils.equals(id, p.getDataSetId()) || dataSetId.equals(p.getDataSetId())) //
                             .block() //
-                    ) //
-                    .toStream(1);
+                    );
         };
     }
 

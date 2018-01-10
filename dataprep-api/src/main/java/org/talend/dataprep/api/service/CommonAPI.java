@@ -13,7 +13,7 @@
 package org.talend.dataprep.api.service;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.talend.dataprep.api.service.command.error.ErrorList.ServiceType.*;
+import static org.talend.dataprep.api.service.command.error.ErrorList.ServiceType.DATASET;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.talend.daikon.client.ClientService;
 import org.talend.daikon.exception.error.ErrorCode;
 import org.talend.dataprep.api.service.command.error.ErrorList;
 import org.talend.dataprep.api.type.Type;
@@ -34,6 +35,8 @@ import org.talend.dataprep.exception.error.APIErrorCodes;
 import org.talend.dataprep.exception.error.CommonErrorCodes;
 import org.talend.dataprep.exception.json.JsonErrorCodeDescription;
 import org.talend.dataprep.metrics.Timed;
+import org.talend.dataprep.preparation.service.IPreparationService;
+import org.talend.dataprep.transformation.service.ITransformationService;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -50,6 +53,9 @@ public class CommonAPI extends APIService {
 
     @Autowired
     private ObjectMapper mapper;
+
+    @Autowired
+    private ClientService clients;
 
     /**
      * Describe the supported error codes.
@@ -81,16 +87,12 @@ public class CommonAPI extends APIService {
         }
 
         // get preparation api errors
-        HystrixCommand<InputStream> preparationErrors = getCommand(ErrorList.class, GenericCommand.PREPARATION_GROUP, PREPARATION);
-        try (InputStream errorsInput = preparationErrors.execute()) {
-            writeErrorsFromApi(generator, errorsInput);
-        }
+        final Iterable<JsonErrorCodeDescription> preparationErrors = clients.of(IPreparationService.class).listErrors();
 
         // get transformation api errors
-        HystrixCommand<InputStream> transformationErrors = getCommand(ErrorList.class, GenericCommand.TRANSFORM_GROUP, TRANSFORMATION);
-        try (InputStream errorsInput = transformationErrors.execute()) {
-            writeErrorsFromApi(generator, errorsInput);
-        }
+        final Iterable<JsonErrorCodeDescription> transformationErrors = clients.of(ITransformationService.class).listErrors();
+
+        ... To complete ...
 
         // close the errors array
         generator.writeEndArray();

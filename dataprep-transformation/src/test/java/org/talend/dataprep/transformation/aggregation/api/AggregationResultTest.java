@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.talend.dataprep.services.api.Operator;
 import org.talend.dataprep.transformation.TransformationBaseTest;
 import org.talend.dataprep.transformation.aggregation.operation.NumberContext;
 

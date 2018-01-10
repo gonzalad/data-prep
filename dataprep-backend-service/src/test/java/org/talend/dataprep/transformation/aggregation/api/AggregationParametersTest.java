@@ -21,6 +21,9 @@ import org.hibernate.validator.HibernateValidator;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.talend.dataprep.services.api.AggregationOperation;
+import org.talend.dataprep.services.api.AggregationParameters;
+import org.talend.dataprep.services.api.Operator;
 
 /**
  * Unit test for aggregation parameter validation.

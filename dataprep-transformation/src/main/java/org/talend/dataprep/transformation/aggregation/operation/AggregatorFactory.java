@@ -14,8 +14,8 @@
 package org.talend.dataprep.transformation.aggregation.operation;
 
 import org.springframework.stereotype.Service;
-import org.talend.dataprep.transformation.aggregation.api.AggregationOperation;
-import org.talend.dataprep.transformation.aggregation.api.AggregationParameters;
+import org.talend.dataprep.services.api.AggregationOperation;
+import org.talend.dataprep.services.api.AggregationParameters;
 
 /**
  * Create on demand aggregator.

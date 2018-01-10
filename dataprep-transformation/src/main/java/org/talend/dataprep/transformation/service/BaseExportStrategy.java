@@ -12,21 +12,19 @@
 
 package org.talend.dataprep.transformation.service;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.talend.daikon.exception.ExceptionContext.build;
 import static org.talend.dataprep.exception.error.PreparationErrorCodes.UNABLE_TO_READ_PREPARATION;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.talend.daikon.client.ClientService;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.dataprep.api.filter.FilterService;
 import org.talend.dataprep.api.preparation.Action;
@@ -34,12 +32,11 @@ import org.talend.dataprep.api.preparation.Preparation;
 import org.talend.dataprep.api.preparation.PreparationMessage;
 import org.talend.dataprep.api.preparation.Step;
 import org.talend.dataprep.cache.ContentCache;
-import org.talend.dataprep.command.preparation.PreparationDetailsGet;
-import org.talend.dataprep.command.preparation.PreparationGetActions;
 import org.talend.dataprep.exception.TDPException;
 import org.talend.dataprep.exception.error.TransformationErrorCodes;
 import org.talend.dataprep.format.export.ExportFormat;
 import org.talend.dataprep.lock.LockFactory;
+import org.talend.dataprep.preparation.service.IPreparationService;
 import org.talend.dataprep.security.SecurityProxy;
 import org.talend.dataprep.transformation.api.transformer.TransformerFactory;
 import org.talend.dataprep.transformation.format.FormatRegistrationService;
@@ -49,6 +46,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public abstract class BaseExportStrategy {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseExportStrategy.class);
+
+    @Autowired
+    private ClientService clients;
 
     @Autowired
     protected ApplicationContext applicationContext;
@@ -114,21 +114,8 @@ public abstract class BaseExportStrategy {
      * @return The actions that can be parsed by ActionParser.
      * @see org.talend.dataprep.transformation.api.action.ActionParser
      */
-    protected String getActions(String preparationId, String stepId) {
-        String actions;
-        if (StringUtils.isBlank(preparationId)) {
-            actions = "{\"actions\": []}";
-        } else {
-            final PreparationGetActions getActionsCommand = applicationContext.getBean(PreparationGetActions.class, preparationId,
-                    stepId);
-            try {
-                actions = "{\"actions\": " + IOUtils.toString(getActionsCommand.execute(), UTF_8) + '}';
-            } catch (IOException e) {
-                final ExceptionContext context = ExceptionContext.build().put("id", preparationId).put("version", stepId);
-                throw new TDPException(UNABLE_TO_READ_PREPARATION, e, context);
-            }
-        }
-        return actions;
+    protected List<Action> getActions(String preparationId, String stepId) {
+        return clients.of(IPreparationService.class).getVersionedAction(preparationId, stepId);
     }
 
     /**
@@ -141,7 +128,7 @@ public abstract class BaseExportStrategy {
      * @return The actions that can be parsed by ActionParser.
      * @see org.talend.dataprep.transformation.api.action.ActionParser
      */
-    protected String getActions(String preparationId, String startStepId, String endStepId) {
+    protected List<Action> getActions(String preparationId, String startStepId, String endStepId) {
         if (Step.ROOT_STEP.id().equals(startStepId)) {
             return getActions(preparationId, endStepId);
         }
@@ -150,14 +137,10 @@ public abstract class BaseExportStrategy {
             actions = "{\"actions\": []}";
         } else {
             try {
-                final PreparationGetActions startStepActions = applicationContext.getBean(PreparationGetActions.class,
-                        preparationId, startStepId);
-                final PreparationGetActions endStepActions = applicationContext.getBean(PreparationGetActions.class,
-                        preparationId, endStepId);
                 final StringWriter actionsAsString = new StringWriter();
-                final Action[] startActions = mapper.readValue(startStepActions.execute(), Action[].class);
-                final Action[] endActions = mapper.readValue(endStepActions.execute(), Action[].class);
-                if (endActions.length > startActions.length) {
+                final List<Action> startActions = clients.of(IPreparationService.class).getVersionedAction(preparationId, startStepId);
+                final List<Action> endActions = clients.of(IPreparationService.class).getVersionedAction(preparationId, endStepId);
+                if (endActions.size() > startActions.size()) {
                     final Action[] filteredActions = (Action[]) ArrayUtils.subarray(endActions, startActions.length,
                             endActions.length);
                     LOGGER.debug("Reduced actions list from {} to {} action(s)", endActions.length, filteredActions.length);
@@ -193,14 +176,7 @@ public abstract class BaseExportStrategy {
         if ("origin".equals(stepId)) {
             stepId = Step.ROOT_STEP.id();
         }
-        final PreparationDetailsGet preparationDetailsGet = applicationContext.getBean(PreparationDetailsGet.class,
-                preparationId, stepId);
-        try (InputStream details = preparationDetailsGet.execute()) {
-            return mapper.readerFor(PreparationMessage.class).readValue(details);
-        } catch (Exception e) {
-            LOGGER.error("Unable to read preparation {}", preparationId, e);
-            throw new TDPException(UNABLE_TO_READ_PREPARATION, e, build().put("id", preparationId));
-        }
+        return clients.of(IPreparationService.class).getPreparationDetails(preparationId, stepId);
     }
 
 }

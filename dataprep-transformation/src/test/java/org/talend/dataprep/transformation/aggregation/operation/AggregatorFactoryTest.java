@@ -14,7 +14,7 @@
 package org.talend.dataprep.transformation.aggregation.operation;
 
 import org.junit.Test;
-import org.talend.dataprep.transformation.aggregation.api.AggregationParameters;
+import org.talend.dataprep.services.api.AggregationParameters;
 
 /**
  * Unit test for the AggregatorFactory.

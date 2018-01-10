@@ -20,7 +20,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -38,7 +37,6 @@ import org.talend.dataprep.api.preparation.PreparationActions;
 import org.talend.dataprep.api.preparation.PreparationMessage;
 import org.talend.dataprep.api.preparation.Step;
 import org.talend.dataprep.api.service.api.EnrichedPreparation;
-import org.talend.dataprep.api.service.command.preparation.LocatePreparation;
 import org.talend.dataprep.command.dataset.DataSetGet;
 import org.talend.dataprep.command.dataset.DataSetGetMetadata;
 import org.talend.dataprep.conversions.BeanConversionService;
@@ -86,7 +84,6 @@ public class APIPreparationConversionsTest {
         final PreparationMessage preparation = getPreparationMessage(metadata.getId());
 
         Folder folder = getFolder("F-753854");
-        setupHystrixCommand(LocatePreparation.class, folder);
 
         // when
         final EnrichedPreparation actual = conversionService.convert(preparation, EnrichedPreparation.class);
@@ -149,7 +146,6 @@ public class APIPreparationConversionsTest {
         preparation.setSteps(asList(Step.ROOT_STEP, Step.ROOT_STEP));
 
         Folder folder = getFolder("F-753854");
-        setupHystrixCommand(LocatePreparation.class, folder);
 
         // when
         final EnrichedPreparation actual = conversionService.convert(preparation, EnrichedPreparation.class);

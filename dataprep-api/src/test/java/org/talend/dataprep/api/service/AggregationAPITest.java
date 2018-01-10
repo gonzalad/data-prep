@@ -21,7 +21,7 @@ import static org.talend.dataprep.test.SameJSONFile.sameJSONAsFile;
 import java.io.IOException;
 
 import org.junit.Test;
-import org.talend.dataprep.transformation.aggregation.api.AggregationParameters;
+import org.talend.dataprep.services.api.AggregationParameters;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;

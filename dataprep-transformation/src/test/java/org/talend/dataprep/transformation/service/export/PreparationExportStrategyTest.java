@@ -31,8 +31,6 @@ import org.talend.dataprep.api.preparation.Preparation;
 import org.talend.dataprep.cache.ContentCache;
 import org.talend.dataprep.command.dataset.DataSetGet;
 import org.talend.dataprep.command.dataset.DataSetGetMetadata;
-import org.talend.dataprep.command.preparation.PreparationDetailsGet;
-import org.talend.dataprep.command.preparation.PreparationGetActions;
 import org.talend.dataprep.security.SecurityProxy;
 import org.talend.dataprep.transformation.api.transformer.ExecutableTransformer;
 import org.talend.dataprep.transformation.api.transformer.Transformer;
@@ -75,9 +73,6 @@ public class PreparationExportStrategyTest {
     @Mock
     private Transformer transformer;
 
-    @Mock
-    private PreparationDetailsGet preparationDetailsGet;
-
     @Before
     public void setUp() throws Exception {
         // Given
@@ -101,10 +96,6 @@ public class PreparationExportStrategyTest {
         when(dataSetGet.execute()).thenReturn(new ByteArrayInputStream(dataSetAsString.toString().getBytes()));
         when(applicationContext.getBean(eq(DataSetGet.class), anyVararg())).thenReturn(dataSetGet);
 
-        final PreparationGetActions preparationGetActions = mock(PreparationGetActions.class);
-        when(preparationGetActions.execute()).thenReturn(new ByteArrayInputStream("{}".getBytes()));
-        when(applicationContext.getBean(eq(PreparationGetActions.class), eq("prep-1234"), anyString()))
-                .thenReturn(preparationGetActions);
 
         final TransformationCacheKey cacheKey = mock(TransformationCacheKey.class);
         when(cacheKey.getKey()).thenReturn("cache-1234");
@@ -122,10 +113,6 @@ public class PreparationExportStrategyTest {
     private void configurePreparation(Preparation preparation, String preparationId, String stepId) throws IOException {
         final StringWriter preparationAsString = new StringWriter();
         mapper.writerFor(Preparation.class).writeValue(preparationAsString, preparation);
-        when(preparationDetailsGet.execute())
-                .thenReturn(new ByteArrayInputStream(preparationAsString.toString().getBytes()));
-        when(applicationContext.getBean(eq(PreparationDetailsGet.class), eq(preparationId), eq(stepId)))
-                .thenReturn(preparationDetailsGet);
     }
 
     @Test

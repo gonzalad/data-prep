@@ -17,9 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.talend.dataprep.api.dataset.row.DataSetRow;
-import org.talend.dataprep.transformation.aggregation.api.AggregationOperation;
-import org.talend.dataprep.transformation.aggregation.api.AggregationParameters;
-import org.talend.dataprep.transformation.aggregation.api.Operator;
+import org.talend.dataprep.services.api.AggregationOperation;
+import org.talend.dataprep.services.api.AggregationParameters;
+import org.talend.dataprep.services.api.Operator;
 
 /**
  * Base class for aggregation operation tests used to factorize code and make unit tests easier.

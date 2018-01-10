@@ -15,27 +15,27 @@ package org.talend.dataprep.api.service;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.talend.dataprep.command.CommandHelper.toStream;
 
 import java.io.InputStream;
 import java.util.stream.Stream;
 
 import javax.validation.Valid;
 
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import org.talend.daikon.client.ClientService;
 import org.talend.dataprep.api.action.ActionForm;
+import org.talend.dataprep.api.dataset.ColumnMetadata;
+import org.talend.dataprep.api.export.ExportParameters;
 import org.talend.dataprep.api.service.api.DynamicParamsInput;
-import org.talend.dataprep.api.service.command.preparation.PreparationGetContent;
-import org.talend.dataprep.api.service.command.transformation.*;
-import org.talend.dataprep.command.CommandHelper;
-import org.talend.dataprep.command.GenericCommand;
 import org.talend.dataprep.command.dataset.DataSetGet;
 import org.talend.dataprep.metrics.Timed;
+import org.talend.dataprep.transformation.api.action.dynamic.GenericParameter;
+import org.talend.dataprep.transformation.service.ITransformationService;
 
 import com.netflix.hystrix.HystrixCommand;
 
@@ -44,6 +44,9 @@ import io.swagger.annotations.ApiParam;
 
 @RestController
 public class TransformAPI extends APIService {
+
+    @Autowired
+    private ClientService clients;
 
     /**
      * Get all the possible actions for a given column.
@@ -56,9 +59,8 @@ public class TransformAPI extends APIService {
     @RequestMapping(value = "/api/transform/actions/column", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get all actions for a data set column.", notes = "Returns all actions for the given column.")
     @Timed
-    public Stream<ActionForm> columnActions(@ApiParam(value = "Optional column Metadata content as JSON") InputStream body) {
-        // Asks transformation service for all actions for column type and domain
-        return toStream(ActionForm.class, mapper, getCommand(ColumnActions.class, body));
+    public Stream<ActionForm> columnActions(@ApiParam(value = "Optional column Metadata content as JSON") ColumnMetadata body) {
+        return clients.of(ITransformationService.class).columnActions(body);
     }
 
     /**
@@ -72,9 +74,8 @@ public class TransformAPI extends APIService {
     @RequestMapping(value = "/api/transform/suggest/column", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get suggested actions for a data set column.", notes = "Returns the suggested actions for the given column in decreasing order of likeness.")
     @Timed
-    public Stream<ActionForm> suggestColumnActions(@ApiParam(value = "Column Metadata content as JSON") InputStream body) {
-        // Asks transformation service for suggested actions for column type and domain
-        return toStream(ActionForm.class, mapper, getCommand(SuggestColumnActions.class, body));
+    public Stream<ActionForm> suggestColumnActions(@ApiParam(value = "Column Metadata content as JSON") ColumnMetadata body) {
+        return clients.of(ITransformationService.class).suggest(body, 5);
     }
 
     /**
@@ -84,7 +85,7 @@ public class TransformAPI extends APIService {
     @ApiOperation(value = "Get all actions on line", notes = "Returns all actions for a line.")
     @Timed
     public Stream<ActionForm> lineActions() {
-        return toStream(ActionForm.class, mapper, getCommand(LineActions.class));
+        return clients.of(ITransformationService.class).lineActions();
     }
 
     /**
@@ -94,7 +95,7 @@ public class TransformAPI extends APIService {
     @ApiOperation(value = "Get all actions the whole dataset.", notes = "Returns all actions for the whole dataset..")
     @Timed
     public Stream<ActionForm> datasetActions() {
-        return toStream(ActionForm.class, mapper, getCommand(DatasetActions.class));
+        return clients.of(ITransformationService.class).datasetActions();
     }
 
     /**
@@ -104,22 +105,25 @@ public class TransformAPI extends APIService {
     @RequestMapping(value = "/api/transform/suggest/{action}/params", method = GET, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get the transformation dynamic parameters", notes = "Returns the transformation parameters.")
     @Timed
-    public ResponseEntity<StreamingResponseBody> suggestActionParams(
+    public GenericParameter suggestActionParams(
             @ApiParam(value = "Transformation name.") @PathVariable("action") final String action,
             @ApiParam(value = "Suggested dynamic transformation input (preparation id or dataset id") @Valid final DynamicParamsInput dynamicParamsInput) {
         // get preparation/dataset content
         HystrixCommand<InputStream> inputData;
         final String preparationId = dynamicParamsInput.getPreparationId();
         if (isNotBlank(preparationId)) {
-            inputData = getCommand(PreparationGetContent.class, preparationId, dynamicParamsInput.getStepId());
+            ExportParameters parameters = new ExportParameters();
+            parameters.setPreparationId(preparationId);
+            parameters.setStepId(dynamicParamsInput.getStepId());
+            parameters.setExportType("JSON");
+            parameters.setFrom(ExportParameters.SourceType.HEAD);
+
+            inputData = clients.of(ITransformationService.class).execute(parameters);
         } else {
             inputData = getCommand(DataSetGet.class, dynamicParamsInput.getDatasetId(), false, false);
         }
 
-        // get params, passing content in the body
-        final GenericCommand<InputStream> getActionDynamicParams = getCommand(SuggestActionParams.class, inputData, action,
-                dynamicParamsInput.getColumnId());
-        return CommandHelper.toStreaming(getActionDynamicParams);
+        return clients.of(ITransformationService.class).dynamicParams(action, dynamicParamsInput.getColumnId(), inputData.execute());
     }
 
     /**
@@ -129,8 +133,6 @@ public class TransformAPI extends APIService {
     @ApiOperation(value = "Get current dictionary (as serialized object).", notes = "Returns a DQ dictionary serialized usin Java serialization and GZIP-ed.")
     @Timed
     public StreamingResponseBody getDictionary() {
-        // get preparation/dataset content
-        HystrixCommand<InputStream> dictionaryCommand = getCommand(DictionaryCommand.class);
-        return CommandHelper.toStreaming(dictionaryCommand);
+        return clients.of(ITransformationService.class).getDictionary();
     }
 }

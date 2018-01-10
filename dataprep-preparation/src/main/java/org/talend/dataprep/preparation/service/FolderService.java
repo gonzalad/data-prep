@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.dataprep.api.folder.Folder;
 import org.talend.dataprep.api.folder.FolderInfo;
@@ -45,7 +46,7 @@ import io.swagger.annotations.ApiParam;
 
 @RestController
 @Api(value = "folders", basePath = "/folders", description = "Operations on folders")
-public class FolderService {
+public class FolderService implements IFolderService {
 
     /** This class' logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(FolderService.class);
@@ -58,19 +59,14 @@ public class FolderService {
     @Autowired
     private Security security;
 
-    /**
-     * Get folders. If parentId is supplied, it will be used as filter.
-     *
-     * @param parentId the parent folder id parameter
-     * @return direct sub folders for the given id.
-     */
     //@formatter:off
+    @Override
     @RequestMapping(value = "/folders", method = GET)
     @ApiOperation(value = "List children folders of the parameter if null list root children.", notes = "List all child folders of the one as parameter")
     @Timed
     public Stream<Folder> list(@RequestParam(required = false) @ApiParam(value = "Parent id filter.") String parentId,
-                                   @RequestParam(defaultValue = "lastModificationDate") @ApiParam(value = "Sort key (by name or date).") Sort sort,
-                                   @RequestParam(defaultValue = "desc") @ApiParam(value = "Order for sort key (desc or asc).") Order order) {
+                               @RequestParam(defaultValue = "lastModificationDate") @ApiParam(value = "Sort key (by name or date).") Sort sort,
+                               @RequestParam(defaultValue = "desc") @ApiParam(value = "Order for sort key (desc or asc).") Order order) {
     //@formatter:on
 
         Stream<Folder> children;
@@ -99,12 +95,7 @@ public class FolderService {
         return children.sorted(getFolderComparator(sort, order));
     }
 
-    /**
-     * Get a folder metadata with its hierarchy
-     *
-     * @param id the folder id.
-     * @return the folder metadata with its hierarchy.
-     */
+    @Override
     @RequestMapping(value = "/folders/{id}", method = GET)
     @ApiOperation(value = "Get folder by id", notes = "GET a folder by id")
     @Timed
@@ -118,19 +109,13 @@ public class FolderService {
         return new FolderInfo(folder, hierarchy);
     }
 
-    /**
-     * Search for folders.
-     *
-     * @param name the folder name to search.
-     * @param strict strict mode means the name is the full name.
-     * @return the folders whose part of their name match the given path.
-     */
+    @Override
     @RequestMapping(value = "/folders/search", method = GET)
     @ApiOperation(value = "Search Folders with parameter as part of the name")
     @Timed
     public Stream<Folder> search(@RequestParam(required = false, defaultValue = "") final String name,
-                                   @RequestParam(required = false, defaultValue = "false") final Boolean strict,
-                                   @RequestParam(required = false) final String path) {
+                                 @RequestParam(required = false, defaultValue = "false") final Boolean strict,
+                                 @RequestParam(required = false) final String path) {
         Stream<Folder> folders;
         if (path == null) {
             folders = folderRepository.searchFolders(name, strict);
@@ -149,27 +134,18 @@ public class FolderService {
         return folders;
     }
 
-    /**
-     * Add a folder.
-     *
-     * @param parentId where to add the folder.
-     * @return the created folder.
-     */
+    @Override
     @RequestMapping(value = "/folders", method = PUT)
     @ApiOperation(value = "Create a Folder", notes = "Create a folder")
     @Timed
-    public Folder addFolder(@RequestParam(required = false) String parentId, @RequestParam String path) {
+    public StreamingResponseBody addFolder(@RequestParam(required = false) String parentId, @RequestParam String path) {
         if (parentId == null) {
             parentId = folderRepository.getHome().getId();
         }
         return folderRepository.addFolder(parentId, path);
     }
 
-    /**
-     * Remove the folder. Throws an exception if the folder, or one of its sub folders, contains an entry.
-     *
-     * @param id the id that points to the folder to remove.
-     */
+    @Override
     @RequestMapping(value = "/folders/{id}", method = DELETE)
     @ApiOperation(value = "Remove a Folder", notes = "Remove the folder")
     @Timed
@@ -177,12 +153,7 @@ public class FolderService {
         folderRepository.removeFolder(id);
     }
 
-    /**
-     * Rename the folder to the new id.
-     *
-     * @param id where to look for the folder.
-     * @param newName the new folder id.
-     */
+    @Override
     @RequestMapping(value = "/folders/{id}/name", method = PUT)
     @ApiOperation(value = "Rename a Folder")
     @Timed
@@ -190,6 +161,7 @@ public class FolderService {
         folderRepository.renameFolder(id, newName);
     }
 
+    @Override
     @RequestMapping(value = "/folders/tree", method = GET)
     @ApiOperation(value = "List all folders")
     @Timed
