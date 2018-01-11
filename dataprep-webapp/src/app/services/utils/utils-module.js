@@ -1,6 +1,6 @@
 /*  ============================================================================
 
- Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+ Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 
  This source code is available under agreement available at
  https://github.com/Talend/data-prep/blob/master/LICENSE
@@ -15,7 +15,6 @@ import angular from 'angular';
 import ngTranslate from 'angular-translate';
 
 import copyright from './config/utils-copyrights-service';
-import version from './config/utils-version-service';
 import TDPMoment from './moment/moment-filter';
 import RestURLs from './config/utils-rest-urls-service';
 import ConverterService from './converter/converter-service';
@@ -39,7 +38,6 @@ const MODULE_NAME = 'data-prep.services.utils';
 angular
 	.module(MODULE_NAME, [ngTranslate])
 	.value('copyRights', copyright)
-	.value('version', version)
 	.filter('TDPMoment', TDPMoment)
 	.service('RestURLs', RestURLs)
 	.service('ConverterService', ConverterService)

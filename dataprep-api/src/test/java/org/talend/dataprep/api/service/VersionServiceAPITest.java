@@ -1,6 +1,6 @@
 //  ============================================================================
 //
-//  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+//  Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 //  This source code is available under agreement available at
 //  https://github.com/Talend/data-prep/blob/master/LICENSE
@@ -16,9 +16,8 @@ package org.talend.dataprep.api.service;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.talend.dataprep.info.Version;
+import org.talend.dataprep.info.BuildDetails;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.response.Response;
@@ -36,10 +35,10 @@ public class VersionServiceAPITest extends ApiServiceTestBase {
 
         Assert.assertEquals(200, response.getStatusCode());
 
-        Version[] versions = objectMapper.readValue(response.asString(), new TypeReference<Version[]>() {
-        });
+        BuildDetails buildDetails = objectMapper.readValue(response.asString(), BuildDetails.class);
 
-        Assert.assertEquals(4, versions.length);
+        Assert.assertEquals(4, buildDetails.getServices().length);
+        Assert.assertEquals("GLOBAL_VERSION", buildDetails.getDisplayVersion());
     }
 
     @Test
@@ -53,12 +52,11 @@ public class VersionServiceAPITest extends ApiServiceTestBase {
                 .when() //
                 .get("/api/version");
 
-        Version[] versions = objectMapper.readValue(response.asString(), new TypeReference<Version[]>() {
-        });
+        BuildDetails buildDetails = objectMapper.readValue(response.asString(), BuildDetails.class);
 
-        Version[] versions2 = objectMapper.readValue(response2.asString(), new TypeReference<Version[]>() {
-        });
+        BuildDetails buildDetails2 = objectMapper.readValue(response.asString(), BuildDetails.class);
 
-        Assert.assertArrayEquals(versions, versions2);
+        Assert.assertArrayEquals(buildDetails.getServices(), buildDetails2.getServices());
+        Assert.assertEquals(buildDetails.getDisplayVersion(), buildDetails2.getDisplayVersion());
     }
 }

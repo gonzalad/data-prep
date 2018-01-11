@@ -1,6 +1,6 @@
 // ============================================================================
 //
-// Copyright (C) 2006-2017 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2018 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
 // https://github.com/Talend/data-prep/blob/master/LICENSE
@@ -287,7 +287,7 @@ public class OSDataPrepAPIHelper {
 
     /**
      * Export the current preparation sample depending the given parameters.
-     * 
+     *
      * @param parameters the export parameters.
      * @return the response.
      */
@@ -433,4 +433,10 @@ public class OSDataPrepAPIHelper {
         return Base64.getEncoder().encodeToString(value.getBytes());
     }
 
+    public Response getExportFormats(String preparationId) {
+        return given() //
+                .baseUri(apiBaseUrl) //
+                .when() //
+                .get("/api/export/formats/preparations/" + preparationId);
+    }
 }
