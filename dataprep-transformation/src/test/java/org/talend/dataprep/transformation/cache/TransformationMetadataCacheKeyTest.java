@@ -1,12 +1,12 @@
 package org.talend.dataprep.transformation.cache;
 
-import org.junit.Test;
-import org.talend.dataprep.cache.ContentCacheKey;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.talend.dataprep.api.export.ExportParameters.SourceType.FILTER;
-import static org.talend.dataprep.api.export.ExportParameters.SourceType.HEAD;
+import static org.talend.dataprep.services.transformation.ExportParameters.SourceType.FILTER;
+import static org.talend.dataprep.services.transformation.ExportParameters.SourceType.HEAD;
+
+import org.junit.Test;
+import org.talend.dataprep.cache.ContentCacheKey;
 
 public class TransformationMetadataCacheKeyTest {
     @Test

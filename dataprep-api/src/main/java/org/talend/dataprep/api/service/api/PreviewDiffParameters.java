@@ -13,9 +13,9 @@
 
 package org.talend.dataprep.api.service.api;
 
-import org.talend.dataprep.api.export.ExportParameters;
-
 import java.util.List;
+
+import org.talend.dataprep.services.transformation.ExportParameters;
 
 /**
  * Bean that models a preview on an "Diff action" request.

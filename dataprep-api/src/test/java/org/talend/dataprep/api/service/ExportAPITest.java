@@ -27,8 +27,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.talend.dataprep.api.service.api.EnrichedPreparation;
 import org.talend.dataprep.format.export.ExportFormat;
-import org.talend.dataprep.format.export.ExportFormatMessage;
 import org.talend.dataprep.parameters.Parameter;
+import org.talend.dataprep.services.transformation.ExportFormatMessage;
 import org.talend.dataprep.transformation.format.CSVFormat;
 
 import com.fasterxml.jackson.core.type.TypeReference;

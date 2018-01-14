@@ -21,7 +21,7 @@ import org.hibernate.validator.HibernateValidator;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.talend.dataprep.api.export.ExportParameters;
+import org.talend.dataprep.services.transformation.ExportParameters;
 
 /**
  * Unit test for the format parameters.

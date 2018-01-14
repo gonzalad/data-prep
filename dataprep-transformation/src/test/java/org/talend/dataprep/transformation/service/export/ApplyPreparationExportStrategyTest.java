@@ -18,7 +18,7 @@ import static junit.framework.TestCase.assertTrue;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.talend.ServiceBaseTest;
-import org.talend.dataprep.api.export.ExportParameters;
+import org.talend.dataprep.services.transformation.ExportParameters;
 
 public class ApplyPreparationExportStrategyTest extends ServiceBaseTest {
 

@@ -12,7 +12,7 @@
 
 package org.talend.dataprep.transformation.cache;
 
-import static org.talend.dataprep.api.export.ExportParameters.SourceType.HEAD;
+import static org.talend.dataprep.services.transformation.ExportParameters.SourceType.HEAD;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,8 +21,8 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.talend.dataprep.api.export.ExportParameters.SourceType;
 import org.talend.dataprep.security.Security;
+import org.talend.dataprep.services.transformation.ExportParameters.SourceType;
 
 /**
  * Generate cache key

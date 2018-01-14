@@ -29,9 +29,9 @@ import org.talend.dataprep.api.preparation.Step;
 import org.talend.dataprep.api.service.api.EnrichedPreparation;
 import org.talend.dataprep.command.dataset.DataSetGetMetadata;
 import org.talend.dataprep.conversions.BeanConversionService;
-import org.talend.dataprep.preparation.service.IPreparationService;
 import org.talend.dataprep.processor.BeanConversionServiceWrapper;
 import org.talend.dataprep.security.SecurityProxy;
+import org.talend.dataprep.services.preparation.IPreparationService;
 
 @Component
 public class APIPreparationConversions extends BeanConversionServiceWrapper {

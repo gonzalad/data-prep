@@ -15,7 +15,7 @@ package org.talend.dataprep.transformation.aggregation.operation;
 
 import org.apache.commons.lang.StringUtils;
 import org.talend.dataprep.api.dataset.row.DataSetRow;
-import org.talend.dataprep.transformation.aggregation.api.AggregationResult;
+import org.talend.dataprep.services.transformation.AggregationResult;
 
 /**
  * Sum aggregator.

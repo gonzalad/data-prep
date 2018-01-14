@@ -18,8 +18,8 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.talend.dataprep.api.export.ExportParameters;
 import org.talend.dataprep.api.preparation.Action;
+import org.talend.dataprep.services.transformation.ExportParameters;
 import org.talend.dataprep.validation.OneNotBlank;
 
 /**

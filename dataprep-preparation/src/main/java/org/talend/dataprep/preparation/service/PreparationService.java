@@ -59,6 +59,7 @@ import org.talend.dataprep.folder.store.FolderRepository;
 import org.talend.dataprep.lock.store.LockedResourceRepository;
 import org.talend.dataprep.preparation.store.PreparationRepository;
 import org.talend.dataprep.security.Security;
+import org.talend.dataprep.services.preparation.IPreparationService;
 import org.talend.dataprep.transformation.actions.common.ActionFactory;
 import org.talend.dataprep.transformation.actions.common.ImplicitParameters;
 import org.talend.dataprep.transformation.actions.common.RunnableAction;

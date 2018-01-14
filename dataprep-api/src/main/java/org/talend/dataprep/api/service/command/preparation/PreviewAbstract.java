@@ -25,13 +25,13 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.springframework.http.HttpStatus;
-import org.talend.dataprep.api.export.ExportParameters;
 import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.api.preparation.Preparation;
 import org.talend.dataprep.command.GenericCommand;
 import org.talend.dataprep.exception.TDPException;
 import org.talend.dataprep.exception.error.TransformationErrorCodes;
-import org.talend.dataprep.transformation.preview.api.PreviewParameters;
+import org.talend.dataprep.services.transformation.ExportParameters;
+import org.talend.dataprep.services.transformation.PreviewParameters;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 

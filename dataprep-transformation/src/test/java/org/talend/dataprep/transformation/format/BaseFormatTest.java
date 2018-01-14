@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.talend.dataprep.conversions.BeanConversionService;
 import org.talend.dataprep.format.export.ExportFormat;
-import org.talend.dataprep.format.export.ExportFormatMessage;
+import org.talend.dataprep.services.transformation.ExportFormatMessage;
 import org.talend.dataprep.test.SpringLocalizationRule;
 import org.talend.dataprep.transformation.TransformationBaseTest;
 

@@ -1,4 +1,4 @@
-package org.talend.dataprep.transformation.service;
+package org.talend.dataprep.services.transformation;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
@@ -17,20 +17,15 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import org.talend.daikon.annotation.Service;
 import org.talend.dataprep.api.action.ActionForm;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
-import org.talend.dataprep.api.dataset.DataSet;
 import org.talend.dataprep.api.dataset.DataSetMetadata;
 import org.talend.dataprep.api.dataset.statistics.SemanticDomain;
-import org.talend.dataprep.api.export.ExportParameters;
 import org.talend.dataprep.api.preparation.StepDiff;
 import org.talend.dataprep.exception.json.JsonErrorCodeDescription;
-import org.talend.dataprep.format.export.ExportFormatMessage;
 import org.talend.dataprep.metrics.Timed;
 import org.talend.dataprep.metrics.VolumeMetered;
 import org.talend.dataprep.security.PublicAPI;
 import org.talend.dataprep.services.api.AggregationParameters;
-import org.talend.dataprep.transformation.aggregation.api.AggregationResult;
 import org.talend.dataprep.transformation.api.action.dynamic.GenericParameter;
-import org.talend.dataprep.transformation.preview.api.PreviewParameters;
 
 /**
  *
@@ -193,12 +188,12 @@ public interface ITransformationService {
     /**
      * This operation returns an array of suggested actions in decreasing order of importance.
      *
-     * @param dataSet
+     * @param dataSetMetadata
      * @return
      */
     @RequestMapping(value = "/suggest/dataset", method = POST)
     @ResponseBody
-    List<ActionForm> suggest(DataSet dataSet);
+    List<ActionForm> suggest(DataSetMetadata dataSetMetadata);
 
     /**
      * Returns the list of all transformation related error codes.

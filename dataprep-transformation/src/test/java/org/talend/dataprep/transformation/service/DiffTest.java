@@ -17,7 +17,7 @@ import static com.jayway.restassured.RestAssured.given;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
-import static org.talend.dataprep.api.export.ExportParameters.SourceType.HEAD;
+import static org.talend.dataprep.services.transformation.ExportParameters.SourceType.HEAD;
 import static org.talend.dataprep.test.SameJSONFile.sameJSONAsFile;
 
 import java.io.IOException;
@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
-import org.talend.dataprep.transformation.preview.api.PreviewParameters;
+import org.talend.dataprep.services.transformation.PreviewParameters;
 
 import com.jayway.restassured.http.ContentType;
 

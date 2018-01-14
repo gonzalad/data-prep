@@ -15,8 +15,8 @@ package org.talend.dataprep.api.service.api;
 
 import java.util.List;
 
-import org.talend.dataprep.api.export.ExportParameters;
 import org.talend.dataprep.api.preparation.Action;
+import org.talend.dataprep.services.transformation.ExportParameters;
 
 public class PreviewUpdateParameters {
 

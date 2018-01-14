@@ -11,7 +11,7 @@
 //
 //  ============================================================================
 
-package org.talend.dataprep.transformation.aggregation.api;
+package org.talend.dataprep.services.transformation;
 
 /**
  * Interface for all the aggregation result working context.

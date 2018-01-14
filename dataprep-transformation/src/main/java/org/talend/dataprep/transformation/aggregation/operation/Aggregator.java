@@ -16,7 +16,7 @@ package org.talend.dataprep.transformation.aggregation.operation;
 import java.util.function.BiConsumer;
 
 import org.talend.dataprep.api.dataset.row.DataSetRow;
-import org.talend.dataprep.transformation.aggregation.api.AggregationResult;
+import org.talend.dataprep.services.transformation.AggregationResult;
 
 /**
  * Base interface for all aggregators.

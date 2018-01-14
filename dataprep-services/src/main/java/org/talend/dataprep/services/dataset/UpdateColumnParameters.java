@@ -11,7 +11,7 @@
 //
 // ============================================================================
 
-package org.talend.dataprep.dataset.service.api;
+package org.talend.dataprep.services.dataset;
 
 public class UpdateColumnParameters {
 

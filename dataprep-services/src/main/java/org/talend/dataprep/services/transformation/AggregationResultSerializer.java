@@ -11,16 +11,13 @@
 //
 //  ============================================================================
 
-package org.talend.dataprep.transformation.aggregation.api.json;
+package org.talend.dataprep.services.transformation;
 
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.talend.dataprep.transformation.aggregation.api.AggregationResult;
-import org.talend.dataprep.transformation.aggregation.api.WorkingContext;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;

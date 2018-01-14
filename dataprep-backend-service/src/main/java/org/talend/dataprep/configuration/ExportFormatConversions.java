@@ -19,9 +19,9 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 import org.talend.dataprep.conversions.BeanConversionService;
 import org.talend.dataprep.format.export.ExportFormat;
-import org.talend.dataprep.format.export.ExportFormatMessage;
 import org.talend.dataprep.i18n.MessagesBundle;
 import org.talend.dataprep.processor.BeanConversionServiceWrapper;
+import org.talend.dataprep.services.transformation.ExportFormatMessage;
 
 @Component
 public class ExportFormatConversions extends BeanConversionServiceWrapper {

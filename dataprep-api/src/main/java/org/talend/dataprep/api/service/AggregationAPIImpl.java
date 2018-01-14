@@ -18,8 +18,8 @@ import org.talend.daikon.annotation.ServiceImplementation;
 import org.talend.daikon.client.ClientService;
 import org.talend.dataprep.services.api.AggregationAPI;
 import org.talend.dataprep.services.api.AggregationParameters;
-import org.talend.dataprep.transformation.aggregation.api.AggregationResult;
-import org.talend.dataprep.transformation.service.ITransformationService;
+import org.talend.dataprep.services.transformation.AggregationResult;
+import org.talend.dataprep.services.transformation.ITransformationService;
 
 @ServiceImplementation
 public class AggregationAPIImpl extends APIService implements AggregationAPI {

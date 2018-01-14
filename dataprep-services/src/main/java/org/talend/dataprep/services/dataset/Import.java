@@ -1,4 +1,4 @@
-package org.talend.dataprep.api.dataset;
+package org.talend.dataprep.services.dataset;
 
 import static java.util.Collections.emptyList;
 

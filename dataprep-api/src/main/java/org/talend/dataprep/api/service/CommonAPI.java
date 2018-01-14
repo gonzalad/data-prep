@@ -13,7 +13,6 @@
 package org.talend.dataprep.api.service;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.talend.dataprep.api.service.command.error.ErrorList.ServiceType.DATASET;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,20 +27,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.talend.daikon.client.ClientService;
 import org.talend.daikon.exception.error.ErrorCode;
-import org.talend.dataprep.api.service.command.error.ErrorList;
 import org.talend.dataprep.api.type.Type;
-import org.talend.dataprep.command.GenericCommand;
 import org.talend.dataprep.exception.error.APIErrorCodes;
 import org.talend.dataprep.exception.error.CommonErrorCodes;
 import org.talend.dataprep.exception.json.JsonErrorCodeDescription;
 import org.talend.dataprep.metrics.Timed;
-import org.talend.dataprep.preparation.service.IPreparationService;
-import org.talend.dataprep.transformation.service.ITransformationService;
+import org.talend.dataprep.services.dataset.IDataSetService;
+import org.talend.dataprep.services.preparation.IPreparationService;
+import org.talend.dataprep.services.transformation.ITransformationService;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netflix.hystrix.HystrixCommand;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -81,10 +78,7 @@ public class CommonAPI extends APIService {
         writeErrorsFromEnum(generator, APIErrorCodes.values());
 
         // get dataset api errors
-        HystrixCommand<InputStream> datasetErrors = getCommand(ErrorList.class, GenericCommand.DATASET_GROUP, DATASET);
-        try (InputStream errorsInput = datasetErrors.execute()) {
-            writeErrorsFromApi(generator, errorsInput);
-        }
+        final Iterable<JsonErrorCodeDescription> datasetErrors = clients.of(IDataSetService.class).listErrors();
 
         // get preparation api errors
         final Iterable<JsonErrorCodeDescription> preparationErrors = clients.of(IPreparationService.class).listErrors();

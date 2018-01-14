@@ -16,9 +16,9 @@ import static java.util.Collections.singletonList;
 import static org.springframework.context.i18n.LocaleContextHolder.getLocale;
 import static org.talend.daikon.exception.ExceptionContext.build;
 import static org.talend.dataprep.api.dataset.ColumnMetadata.Builder.column;
-import static org.talend.dataprep.api.export.ExportParameters.SourceType.HEAD;
 import static org.talend.dataprep.exception.error.TransformationErrorCodes.UNEXPECTED_EXCEPTION;
 import static org.talend.dataprep.quality.AnalyzerService.Analysis.SEMANTIC;
+import static org.talend.dataprep.services.transformation.ExportParameters.SourceType.HEAD;
 import static org.talend.dataprep.transformation.actions.category.ScopeCategory.*;
 import static org.talend.dataprep.transformation.format.JsonFormat.JSON;
 
@@ -49,7 +49,6 @@ import org.talend.dataprep.api.dataset.DataSetMetadata;
 import org.talend.dataprep.api.dataset.RowMetadata;
 import org.talend.dataprep.api.dataset.row.Flag;
 import org.talend.dataprep.api.dataset.statistics.SemanticDomain;
-import org.talend.dataprep.api.export.ExportParameters;
 import org.talend.dataprep.api.preparation.Preparation;
 import org.talend.dataprep.api.preparation.Step;
 import org.talend.dataprep.api.preparation.StepDiff;
@@ -64,14 +63,13 @@ import org.talend.dataprep.exception.error.CommonErrorCodes;
 import org.talend.dataprep.exception.error.TransformationErrorCodes;
 import org.talend.dataprep.exception.json.JsonErrorCodeDescription;
 import org.talend.dataprep.format.export.ExportFormat;
-import org.talend.dataprep.format.export.ExportFormatMessage;
-import org.talend.dataprep.preparation.service.IPreparationService;
 import org.talend.dataprep.quality.AnalyzerService;
 import org.talend.dataprep.security.SecurityProxy;
 import org.talend.dataprep.services.api.AggregationParameters;
+import org.talend.dataprep.services.preparation.IPreparationService;
+import org.talend.dataprep.services.transformation.*;
 import org.talend.dataprep.transformation.actions.common.RunnableAction;
 import org.talend.dataprep.transformation.aggregation.AggregationService;
-import org.talend.dataprep.transformation.aggregation.api.AggregationResult;
 import org.talend.dataprep.transformation.api.action.ActionParser;
 import org.talend.dataprep.transformation.api.action.context.ActionContext;
 import org.talend.dataprep.transformation.api.action.context.TransformationContext;
@@ -85,7 +83,6 @@ import org.talend.dataprep.transformation.api.transformer.suggestion.SuggestionE
 import org.talend.dataprep.transformation.cache.CacheKeyGenerator;
 import org.talend.dataprep.transformation.cache.TransformationMetadataCacheKey;
 import org.talend.dataprep.transformation.pipeline.ActionRegistry;
-import org.talend.dataprep.transformation.preview.api.PreviewParameters;
 import org.talend.dataquality.common.inference.Analyzer;
 import org.talend.dataquality.common.inference.Analyzers;
 import org.talend.dataquality.semantic.broadcast.TdqCategories;
@@ -553,7 +550,7 @@ public class TransformationService extends BaseTransformationService implements 
     }
 
     @Override
-    public List<ActionForm> suggest(DataSet dataSet) {
+    public List<ActionForm> suggest(DataSetMetadata dataSetMetadata) {
         return Collections.emptyList();
     }
 

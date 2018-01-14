@@ -18,8 +18,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
-import org.talend.dataprep.api.export.ExportParameters;
 import org.talend.dataprep.cache.ContentCacheKey;
+import org.talend.dataprep.services.transformation.ExportParameters;
 
 /**
  * Content cache key used to cache transformation.

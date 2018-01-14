@@ -37,14 +37,12 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import org.talend.daikon.client.ClientService;
 import org.talend.dataprep.api.dataset.DataSetMetadata;
 import org.talend.dataprep.api.dataset.statistics.SemanticDomain;
-import org.talend.dataprep.api.export.ExportParameters;
 import org.talend.dataprep.api.preparation.*;
 import org.talend.dataprep.api.service.api.EnrichedPreparation;
 import org.talend.dataprep.api.service.api.PreviewAddParameters;
 import org.talend.dataprep.api.service.api.PreviewDiffParameters;
 import org.talend.dataprep.api.service.api.PreviewUpdateParameters;
 import org.talend.dataprep.api.service.command.dataset.CompatibleDataSetList;
-import org.talend.dataprep.api.service.command.preparation.PreparationMove;
 import org.talend.dataprep.api.service.command.preparation.PreviewAdd;
 import org.talend.dataprep.api.service.command.preparation.PreviewDiff;
 import org.talend.dataprep.api.service.command.preparation.PreviewUpdate;
@@ -54,11 +52,12 @@ import org.talend.dataprep.command.preparation.PreparationUpdate;
 import org.talend.dataprep.exception.TDPException;
 import org.talend.dataprep.exception.error.APIErrorCodes;
 import org.talend.dataprep.metrics.Timed;
-import org.talend.dataprep.preparation.service.IPreparationService;
 import org.talend.dataprep.preparation.service.UserPreparation;
 import org.talend.dataprep.security.PublicAPI;
+import org.talend.dataprep.services.preparation.IPreparationService;
+import org.talend.dataprep.services.transformation.ExportParameters;
+import org.talend.dataprep.services.transformation.ITransformationService;
 import org.talend.dataprep.transformation.actions.datablending.Lookup;
-import org.talend.dataprep.transformation.service.ITransformationService;
 import org.talend.dataprep.util.SortAndOrderHelper.Format;
 
 import com.netflix.hystrix.HystrixCommand;
@@ -231,14 +230,8 @@ public class PreparationAPI extends APIService {
                      @ApiParam(value = "The new folder path of the preparation.") @RequestParam() String destination,
                      @ApiParam(value = "The new name of the moved dataset.") @RequestParam(defaultValue = "", required = false) String newName) throws IOException {
     //@formatter:on
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Moving preparation (pool: {} )...", getConnectionStats());
-        }
-
-        HystrixCommand<Void> move = getCommand(PreparationMove.class, id, folder, destination, newName);
-        move.execute();
-
+        LOG.debug("Moving preparation...");
+        clients.of(IPreparationService.class).move(id, folder, destination, newName);
         LOG.info("Preparation {} moved from {} to {}/'{}'", id, folder, destination, newName);
     }
 

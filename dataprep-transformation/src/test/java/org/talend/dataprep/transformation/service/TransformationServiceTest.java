@@ -18,9 +18,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyMap;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
-import static org.talend.dataprep.api.export.ExportParameters.SourceType.FILTER;
-import static org.talend.dataprep.api.export.ExportParameters.SourceType.HEAD;
 import static org.talend.dataprep.cache.ContentCache.TimeToLive.PERMANENT;
+import static org.talend.dataprep.services.transformation.ExportParameters.SourceType.FILTER;
+import static org.talend.dataprep.services.transformation.ExportParameters.SourceType.HEAD;
 import static org.talend.dataprep.transformation.format.JsonFormat.JSON;
 
 import java.io.InputStream;

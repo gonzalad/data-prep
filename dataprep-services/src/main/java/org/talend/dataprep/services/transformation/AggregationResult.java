@@ -11,14 +11,13 @@
 //
 //  ============================================================================
 
-package org.talend.dataprep.transformation.aggregation.api;
+package org.talend.dataprep.services.transformation;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.talend.dataprep.services.api.Operator;
-import org.talend.dataprep.transformation.aggregation.api.json.AggregationResultSerializer;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 

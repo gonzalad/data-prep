@@ -36,8 +36,8 @@ import org.talend.dataprep.exception.TDPException;
 import org.talend.dataprep.exception.error.TransformationErrorCodes;
 import org.talend.dataprep.format.export.ExportFormat;
 import org.talend.dataprep.lock.LockFactory;
-import org.talend.dataprep.preparation.service.IPreparationService;
 import org.talend.dataprep.security.SecurityProxy;
+import org.talend.dataprep.services.preparation.IPreparationService;
 import org.talend.dataprep.transformation.api.transformer.TransformerFactory;
 import org.talend.dataprep.transformation.format.FormatRegistrationService;
 

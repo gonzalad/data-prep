@@ -5,7 +5,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.talend.daikon.annotation.Service;
-import org.talend.dataprep.transformation.aggregation.api.AggregationResult;
+import org.talend.dataprep.services.transformation.AggregationResult;
 
 /**
  * High level Aggregation API.

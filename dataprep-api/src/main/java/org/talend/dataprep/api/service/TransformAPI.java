@@ -30,12 +30,12 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import org.talend.daikon.client.ClientService;
 import org.talend.dataprep.api.action.ActionForm;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
-import org.talend.dataprep.api.export.ExportParameters;
 import org.talend.dataprep.api.service.api.DynamicParamsInput;
 import org.talend.dataprep.command.dataset.DataSetGet;
 import org.talend.dataprep.metrics.Timed;
+import org.talend.dataprep.services.transformation.ExportParameters;
+import org.talend.dataprep.services.transformation.ITransformationService;
 import org.talend.dataprep.transformation.api.action.dynamic.GenericParameter;
-import org.talend.dataprep.transformation.service.ITransformationService;
 
 import com.netflix.hystrix.HystrixCommand;
 

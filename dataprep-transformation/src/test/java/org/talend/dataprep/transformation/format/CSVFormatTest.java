@@ -23,8 +23,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.talend.dataprep.api.dataset.DataSetMetadata;
-import org.talend.dataprep.format.export.ExportFormatMessage;
 import org.talend.dataprep.parameters.Parameter;
+import org.talend.dataprep.services.transformation.ExportFormatMessage;
 import org.talend.dataprep.test.LocalizationRule;
 
 /**

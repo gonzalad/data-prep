@@ -20,9 +20,9 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.stereotype.Component;
-import org.talend.dataprep.format.export.ExportFormatMessage;
 import org.talend.dataprep.helper.api.Action;
 import org.talend.dataprep.qa.dto.Folder;
+import org.talend.dataprep.services.transformation.ExportFormatMessage;
 
 /**
  * Used to share data within steps.

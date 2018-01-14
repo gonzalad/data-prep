@@ -52,7 +52,6 @@ import org.springframework.web.bind.annotation.*;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.dataprep.api.dataset.*;
 import org.talend.dataprep.api.dataset.DataSetGovernance.Certification;
-import org.talend.dataprep.api.dataset.Import.ImportBuilder;
 import org.talend.dataprep.api.dataset.location.DataSetLocationService;
 import org.talend.dataprep.api.dataset.location.LocalStoreLocation;
 import org.talend.dataprep.api.dataset.location.locator.DataSetLocatorService;
@@ -73,7 +72,6 @@ import org.talend.dataprep.dataset.event.DataSetRawContentUpdateEvent;
 import org.talend.dataprep.dataset.service.analysis.synchronous.ContentAnalysis;
 import org.talend.dataprep.dataset.service.analysis.synchronous.FormatAnalysis;
 import org.talend.dataprep.dataset.service.analysis.synchronous.SchemaAnalysis;
-import org.talend.dataprep.dataset.service.api.UpdateColumnParameters;
 import org.talend.dataprep.dataset.service.cache.UpdateDataSetCacheKey;
 import org.talend.dataprep.dataset.store.QuotaService;
 import org.talend.dataprep.dataset.store.content.StrictlyBoundedInputStream;
@@ -93,6 +91,10 @@ import org.talend.dataprep.schema.FormatFamilyFactory;
 import org.talend.dataprep.schema.Schema;
 import org.talend.dataprep.security.PublicAPI;
 import org.talend.dataprep.security.Security;
+import org.talend.dataprep.services.dataset.IDataSetService;
+import org.talend.dataprep.services.dataset.Import;
+import org.talend.dataprep.services.dataset.Import.ImportBuilder;
+import org.talend.dataprep.services.dataset.UpdateColumnParameters;
 import org.talend.dataprep.user.store.UserDataRepository;
 import org.talend.dataprep.util.SortAndOrderHelper.Order;
 import org.talend.dataprep.util.SortAndOrderHelper.Sort;
@@ -105,12 +107,10 @@ import io.swagger.annotations.ApiParam;
 
 @RestController
 @Api(value = "datasets", basePath = "/datasets", description = "Operations on data sets")
-public class DataSetService extends BaseDataSetService {
+public class DataSetService extends BaseDataSetService implements IDataSetService {
 
     /** This class' logger. */
     private static final Logger LOG = LoggerFactory.getLogger(DataSetService.class);
-
-    private static final String CONTENT_TYPE = "Content-Type";
 
     /**
      * Format analyzer needed to update the schema.
@@ -178,6 +178,7 @@ public class DataSetService extends BaseDataSetService {
     @Resource(name = "serializer#dataset#executor")
     private TaskExecutor executor;
 
+    @Override
     @RequestMapping(value = "/datasets", method = RequestMethod.GET)
     @ApiOperation(value = "List all data sets and filters on certified, or favorite or a limited number when asked", notes = "Returns the list of data sets (and filters) the current user is allowed to see. Creation date is a Epoch time value (in UTC time zone).")
     @Timed
@@ -233,17 +234,7 @@ public class DataSetService extends BaseDataSetService {
         }
     }
 
-    /**
-     * Returns a list containing all data sets that are compatible with the data set with id <tt>dataSetId</tt>. If no
-     * compatible data set is found an empty list is returned. The data set with id <tt>dataSetId</tt> is never returned
-     * in the list.
-     *
-     * @param dataSetId the specified data set id
-     * @param sort the sort criterion: either name or date.
-     * @param order the sorting order: either asc or desc.
-     * @return a list containing all data sets that are compatible with the data set with id <tt>dataSetId</tt> and
-     * empty list if no data set is compatible.
-     */
+    @Override
     @RequestMapping(value = "/datasets/{id}/compatibledatasets", method = RequestMethod.GET)
     @ApiOperation(value = "List all compatible data sets", notes = "Returns the list of data sets the current user is allowed to see and which are compatible with the specified data set id.")
     @Timed
@@ -265,18 +256,8 @@ public class DataSetService extends BaseDataSetService {
         }
     }
 
-    /**
-     * Creates a new data set and returns the new data set id as text in the response.
-     *
-     * @param name An optional name for the new data set (might be <code>null</code>).
-     * @param size An optional size for the newly created data set.
-     * @param contentType the request content type.
-     * @param content The raw content of the data set (might be a CSV, XLS...) or the connection parameter in case of a
-     * remote csv.
-     * @return The new data id.
-     * @see DataSetService#get(boolean, boolean, String)
-     */
     //@formatter:off
+    @Override
     @RequestMapping(value = "/datasets", method = POST, produces = TEXT_PLAIN_VALUE)
     @ApiOperation(value = "Create a data set", produces = TEXT_PLAIN_VALUE, notes = "Create a new data set based on content provided in POST body. For documentation purposes, body is typed as 'text/plain' but operation accepts binary content too. Returns the id of the newly created data set.")
     @Timed
@@ -285,7 +266,7 @@ public class DataSetService extends BaseDataSetService {
             @ApiParam(value = "User readable name of the data set (e.g. 'Finance Report 2015', 'Test Data Set').") @RequestParam(defaultValue = "") String name,
             @ApiParam(value = "An optional tag to be added in data set metadata once created.") @RequestParam(defaultValue = "") String tag,
             @ApiParam(value = "Size of the data set, in bytes.") @RequestParam(defaultValue = "0") long size,
-            @RequestHeader(CONTENT_TYPE) String contentType,
+            @RequestHeader(IDataSetService.CONTENT_TYPE) String contentType,
             @ApiParam(value = "content") InputStream content) throws IOException {
         //@formatter:on
         checkDataSetName(name);
@@ -371,13 +352,7 @@ public class DataSetService extends BaseDataSetService {
         throw hypotheticalException;
     }
 
-    /**
-     * Returns the <b>full</b> data set content for given id.
-     *
-     * @param metadata If <code>true</code>, includes data set metadata information.
-     * @param dataSetId A data set id.
-     * @return The full data set.
-     */
+    @Override
     @RequestMapping(value = "/datasets/{id}/content", method = RequestMethod.GET)
     @ApiOperation(value = "Get a data set by id", notes = "Get a data set content based on provided id. Id should be a UUID returned by the list operation. Not valid or non existing data set id returns empty content.")
     @Timed
@@ -426,17 +401,12 @@ public class DataSetService extends BaseDataSetService {
         };
     }
 
-    /**
-     * Returns the data set {@link DataSetMetadata metadata} for given <code>dataSetId</code>.
-     *
-     * @param dataSetId A data set id. If <code>null</code> <b>or</b> if no data set with provided id exits, operation
-     * returns {@link org.apache.commons.httpclient.HttpStatus#SC_NO_CONTENT} if metadata does not exist.
-     */
+    @Override
     @RequestMapping(value = "/datasets/{id}/metadata", method = RequestMethod.GET)
     @ApiOperation(value = "Get metadata information of a data set by id", notes = "Get metadata information of a data set by id. Not valid or non existing data set id returns empty content.")
     @Timed
     @ResponseBody
-    public DataSet getMetadata(
+    public DataSetMetadata getMetadata(
             @PathVariable(value = "id") @ApiParam(name = "id", value = "Id of the data set metadata") String dataSetId) {
         if (dataSetId == null) {
             HttpResponseContext.status(HttpStatus.NO_CONTENT);
@@ -459,11 +429,7 @@ public class DataSetService extends BaseDataSetService {
         return dataSet;
     }
 
-    /**
-     * Deletes a data set with provided id.
-     *
-     * @param dataSetId A data set id. If data set id is unknown, no exception nor status code to indicate this is set.
-     */
+    @Override
     @RequestMapping(value = "/datasets/{id}", method = RequestMethod.DELETE)
     @ApiOperation(value = "Delete a data set by id", notes = "Delete a data set content based on provided id. Id should be a UUID returned by the list operation. Not valid or non existing data set id returns empty content.")
     @Timed
@@ -482,17 +448,12 @@ public class DataSetService extends BaseDataSetService {
         }
     }
 
-    /**
-     * Copy this dataset to a new one and returns the new data set id as text in the response.
-     *
-     * @param copyName the name of the copy
-     * @return The new data id.
-     */
+    @Override
     @RequestMapping(value = "/datasets/{id}/copy", method = POST, produces = TEXT_PLAIN_VALUE)
     @ApiOperation(value = "Copy a data set", produces = TEXT_PLAIN_VALUE, notes = "Copy a new data set based on the given id. Returns the id of the newly created data set.")
     @Timed
     public String copy(@PathVariable(value = "id") @ApiParam(name = "id", value = "Id of the data set to clone") String dataSetId,
-            @ApiParam(value = "The name of the cloned dataset.") @RequestParam(required = false) String copyName)
+                       @ApiParam(value = "The name of the cloned dataset.") @RequestParam(required = false) String copyName)
             throws IOException {
 
         if (copyName != null) {
@@ -559,14 +520,7 @@ public class DataSetService extends BaseDataSetService {
         }
     }
 
-    /**
-     * Updates a data set content and metadata. If no data set exists for given id, data set is silently created.
-     *
-     * @param dataSetId The id of data set to be updated.
-     * @param name The new name for the data set. Empty name (or <code>null</code>) does not update dataset name.
-     * @param dataSetContent The new content for the data set. If empty, existing content will <b>not</b> be replaced.
-     * For delete operation, look at {@link #delete(String)}.
-     */
+    @Override
     @RequestMapping(value = "/datasets/{id}/raw", method = PUT)
     @ApiOperation(value = "Update a data set by id", notes = "Update a data set content based on provided id and PUT body. Id should be a UUID returned by the list operation. Not valid or non existing data set id returns empty content. For documentation purposes, body is typed as 'text/plain' but operation accepts binary content too.")
     @Timed
@@ -681,9 +635,7 @@ public class DataSetService extends BaseDataSetService {
         }
     }
 
-    /**
-     * List all dataset related error codes.
-     */
+    @Override
     @RequestMapping(value = "/datasets/errors", method = RequestMethod.GET)
     @ApiOperation(value = "Get all dataset related error codes.", notes = "Returns the list of all dataset related error codes.")
     @Timed
@@ -696,15 +648,7 @@ public class DataSetService extends BaseDataSetService {
         return errors;
     }
 
-    /**
-     * Returns preview of the the data set content for given id (first 100 rows). Service might return
-     * {@link org.apache.commons.httpclient.HttpStatus#SC_ACCEPTED} if the data set exists but analysis is not yet fully
-     * completed so content is not yet ready to be served.
-     *
-     * @param metadata If <code>true</code>, includes data set metadata information.
-     * @param sheetName the sheet name to preview
-     * @param dataSetId A data set id.
-     */
+    @Override
     @RequestMapping(value = "/datasets/{id}/preview", method = RequestMethod.GET)
     @ApiOperation(value = "Get a data preview set by id", notes = "Get a data set preview content based on provided id. Not valid or non existing data set id returns empty content. Data set not in drat status will return a redirect 301")
     @Timed
@@ -767,13 +711,7 @@ public class DataSetService extends BaseDataSetService {
         return dataSet;
     }
 
-    /**
-     * Updates a data set metadata. If no data set exists for given id, a {@link TDPException} is thrown.
-     *
-     * @param dataSetId The id of data set to be updated.
-     * @param dataSetMetadata The new content for the data set. If empty, existing content will <b>not</b> be replaced.
-     * For delete operation, look at {@link #delete(String)}.
-     */
+    @Override
     @RequestMapping(value = "/datasets/{id}", method = PUT)
     @ApiOperation(value = "Update a data set metadata by id", notes = "Update a data set metadata according to the content of the PUT body. Id should be a UUID returned by the list operation. Not valid or non existing data set id return an error response.")
     @Timed
@@ -875,12 +813,7 @@ public class DataSetService extends BaseDataSetService {
         }
     }
 
-    /**
-     * list all the favorites dataset for the current user
-     *
-     * @return a list of the dataset Ids of all the favorites dataset for the current user or an empty list if none
-     * found
-     */
+    @Override
     @RequestMapping(value = "/datasets/favorites", method = RequestMethod.GET)
     @ApiOperation(value = "return all favorites datasets of the current user", notes = "Returns the list of favorites datasets.")
     @Timed
@@ -890,15 +823,7 @@ public class DataSetService extends BaseDataSetService {
         return userData != null ? userData.getFavoritesDatasets() : emptyList();
     }
 
-    /**
-     * update the current user data dataset favorites list by adding or removing the dataSetId according to the unset
-     * flag. The user data for the current will be created if it does not exist. If no data set exists for given id, a
-     * {@link TDPException} is thrown.
-     *
-     * @param unset, if true this will remove the dataSetId from the list of favorites, if false then it adds the
-     * dataSetId to the favorite list
-     * @param dataSetId, the id of the favorites data set. If the data set does not exists nothing is done.
-     */
+    @Override
     @RequestMapping(value = "/datasets/{id}/favorite", method = PUT)
     @ApiOperation(value = "set or unset a dataset as favorite", notes = "Specify if a dataset is or is not a favorite for the current user.")
     @Timed
@@ -929,13 +854,7 @@ public class DataSetService extends BaseDataSetService {
         }
     }
 
-    /**
-     * Update the column of the data set and computes the
-     *
-     * @param dataSetId the dataset id.
-     * @param columnId the column id.
-     * @param parameters the new type and domain.
-     */
+    @Override
     @RequestMapping(value = "/datasets/{datasetId}/column/{columnId}", method = POST)
     @ApiOperation(value = "Update a column type and/or domain")
     @Timed
@@ -1004,26 +923,19 @@ public class DataSetService extends BaseDataSetService {
         }
     }
 
-    /**
-     * Search datasets.
-     *
-     * @param name what to searched in datasets.
-     * @param strict If the searched name should be the full name
-     * @return the list of found datasets metadata.
-     * @deprecated please, use {@link #list(Sort, Order, String, boolean, boolean, boolean, boolean)} on {@code /datasets} enpoint
-     * with name and nameStrict parameters.
-     */
+    @Override
     @RequestMapping(value = "/datasets/search", method = GET)
     @ApiOperation(value = "Search the dataset metadata", notes = "Search the dataset metadata.")
     @Timed
     @Deprecated
     public Stream<UserDataSetMetadata> search( //
-            @RequestParam @ApiParam(value = "What to search in data sets") final String name, //
-            @RequestParam @ApiParam(value = "The searched name should be the full name") final boolean strict) {
+                                               @RequestParam @ApiParam(value = "What to search in data sets") final String name, //
+                                               @RequestParam @ApiParam(value = "The searched name should be the full name") final boolean strict) {
         LOG.debug("search datasets metadata for {}", name);
         return list(null, null, name, strict, false, false, false);
     }
 
+    @Override
     @RequestMapping(value = "/datasets/encodings", method = GET)
     @ApiOperation(value = "list the supported encodings for dataset", notes = "This list can be used by user to change dataset encoding.")
     @Timed
@@ -1032,6 +944,7 @@ public class DataSetService extends BaseDataSetService {
         return EncodingSupport.getSupportedCharsets().stream().map(Charset::displayName);
     }
 
+    @Override
     @RequestMapping(value = "/datasets/imports/{import}/parameters", method = GET, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get the import parameters", notes = "This list can be used by user to change dataset encoding.")
     @Timed
@@ -1053,6 +966,7 @@ public class DataSetService extends BaseDataSetService {
         return parametersToReturn;
     }
 
+    @Override
     @RequestMapping(value = "/datasets/{id}/datastore/properties", method = GET)
     @ApiOperation(value = "Get the dataset import parameters", notes = "This list can be used by user to change dataset encoding.")
     @Timed
@@ -1079,6 +993,7 @@ public class DataSetService extends BaseDataSetService {
         return parametersToReturn;
     }
 
+    @Override
     @RequestMapping(value = "/datasets/imports", method = GET)
     @ApiOperation(value = "list the supported encodings for dataset", notes = "This list can be used by user to change dataset encoding.")
     @Timed
@@ -1115,13 +1030,7 @@ public class DataSetService extends BaseDataSetService {
                 });
     }
 
-    /**
-     * Return the semantic types for a given dataset / column.
-     *
-     * @param datasetId the datasetId id.
-     * @param columnId the column id.
-     * @return the semantic types for a given dataset / column.
-     */
+    @Override
     @RequestMapping(value = "/datasets/{datasetId}/columns/{columnId}/types", method = GET)
     @ApiOperation(value = "list the types of the wanted column", notes = "This list can be used by user to change the column type.")
     @Timed

@@ -13,7 +13,7 @@
 
 package org.talend.dataprep.transformation.aggregation.operation;
 
-import org.talend.dataprep.transformation.aggregation.api.WorkingContext;
+import org.talend.dataprep.services.transformation.WorkingContext;
 
 /**
  * Simple working context that only wraps a number.

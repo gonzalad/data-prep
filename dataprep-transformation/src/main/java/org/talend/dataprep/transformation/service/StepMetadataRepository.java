@@ -19,7 +19,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.talend.daikon.client.ClientService;
 import org.talend.dataprep.api.dataset.RowMetadata;
-import org.talend.dataprep.preparation.service.IPreparationService;
+import org.talend.dataprep.services.preparation.IPreparationService;
 
 /**
  * This service provides operation to update a preparation in preparation service. This is useful when transformation

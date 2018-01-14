@@ -12,7 +12,7 @@
 package org.talend.dataprep.transformation.service;
 
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-import org.talend.dataprep.api.export.ExportParameters;
+import org.talend.dataprep.services.transformation.ExportParameters;
 
 public interface ExportStrategy {
 

@@ -13,19 +13,19 @@
 package org.talend.dataprep.api.service.settings.actions.configurer;
 
 import static org.talend.dataprep.api.service.settings.actions.provider.DatasetActions.DATASET_CREATE;
-import static org.talend.dataprep.command.CommandHelper.toStream;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.talend.dataprep.api.dataset.Import;
-import org.talend.dataprep.api.service.command.dataset.DataSetGetImports;
+import org.talend.daikon.client.ClientService;
 import org.talend.dataprep.api.service.settings.AppSettingsConfigurer;
 import org.talend.dataprep.api.service.settings.actions.api.ActionSettings;
 import org.talend.dataprep.api.service.settings.actions.api.ActionSplitDropdownSettings;
 import org.talend.dataprep.exception.TDPException;
+import org.talend.dataprep.services.dataset.IDataSetService;
+import org.talend.dataprep.services.dataset.Import;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -36,7 +36,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ImportTypesConfigurer extends AppSettingsConfigurer<ActionSettings> {
 
     @Autowired
-    ObjectMapper mapper;
+    private ClientService clients;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     @Override
     public boolean isApplicable(final ActionSettings actionSettings) {
@@ -53,7 +56,7 @@ public class ImportTypesConfigurer extends AppSettingsConfigurer<ActionSettings>
 
     private Stream<Import> getImportTypes() {
         try {
-            return toStream(Import.class, mapper, getCommand(DataSetGetImports.class));
+            return clients.of(IDataSetService.class).listSupportedImports();
         } catch (final TDPException e) {
             LOGGER.error("Unable to get import types", e);
             return Stream.empty();

@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.talend.dataprep.api.dataset.row.DataSetRow;
-import org.talend.dataprep.transformation.aggregation.api.AggregationResult;
-import org.talend.dataprep.transformation.aggregation.api.WorkingContext;
+import org.talend.dataprep.services.transformation.AggregationResult;
+import org.talend.dataprep.services.transformation.WorkingContext;
 
 /**
  * Average aggregator.

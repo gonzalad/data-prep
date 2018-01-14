@@ -11,9 +11,7 @@
 //
 //  ============================================================================
 
-package org.talend.dataprep.transformation.preview.api;
-
-import org.talend.dataprep.api.export.ExportParameters;
+package org.talend.dataprep.services.transformation;
 
 /**
  * Bean that holds all required data to perform a preview.

@@ -1,23 +1,25 @@
 package org.talend.dataprep.qa.step;
 
-import com.jayway.restassured.response.Response;
-import cucumber.api.DataTable;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
-import org.junit.Assert;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.talend.dataprep.format.export.ExportFormatMessage;
-import org.talend.dataprep.qa.config.DataPrepStep;
-import org.talend.dataprep.qa.step.export.ExportSampleStep;
-import org.talend.dataprep.qa.util.export.ExportParamAnalyzer;
-import org.talend.dataprep.qa.util.export.ExportType;
+import static org.talend.dataprep.qa.config.FeatureContext.suffixName;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import static org.talend.dataprep.qa.config.FeatureContext.suffixName;
+import org.junit.Assert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.talend.dataprep.qa.config.DataPrepStep;
+import org.talend.dataprep.qa.step.export.ExportSampleStep;
+import org.talend.dataprep.qa.util.export.ExportParamAnalyzer;
+import org.talend.dataprep.qa.util.export.ExportType;
+import org.talend.dataprep.services.transformation.ExportFormatMessage;
+
+import com.jayway.restassured.response.Response;
+
+import cucumber.api.DataTable;
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
 
 /**
  * Step dealing with preparation

@@ -37,6 +37,7 @@ import org.talend.dataprep.exception.TDPException;
 import org.talend.dataprep.folder.store.FolderRepository;
 import org.talend.dataprep.metrics.Timed;
 import org.talend.dataprep.security.Security;
+import org.talend.dataprep.services.folder.IFolderService;
 import org.talend.dataprep.util.SortAndOrderHelper.Order;
 import org.talend.dataprep.util.SortAndOrderHelper.Sort;
 
