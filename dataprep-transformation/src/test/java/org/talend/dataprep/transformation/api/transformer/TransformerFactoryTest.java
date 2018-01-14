@@ -19,6 +19,7 @@ import static org.talend.dataprep.transformation.format.CSVFormat.CSV;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.talend.dataprep.api.dataset.DataSet;
+import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.format.export.ExportFormat;
 import org.talend.dataprep.transformation.TransformationBaseTest;
 import org.talend.dataprep.transformation.api.transformer.configuration.Configuration;
@@ -45,11 +47,13 @@ public class TransformerFactoryTest extends TransformationBaseTest {
         arguments.put(ExportFormat.PREFIX + CSVFormat.ParametersCSV.FIELDS_DELIMITER, ";");
         arguments.put(ExportFormat.PREFIX + CSVFormat.ParametersCSV.ENCLOSURE_MODE, CSVFormat.ParametersCSV.ENCLOSURE_ALL_FIELDS);
         final OutputStream outputStream = new ByteArrayOutputStream();
+        final Action action = new Action();
+        action.setName("uppercase");
         final Configuration configuration = Configuration.builder() //
                 .args(arguments) //
                 .format(CSV) //
                 .output(outputStream) //
-                .actions(IOUtils.toString(TransformerFactoryTest.class.getResourceAsStream("upper_case_firstname.json"), UTF_8)) //
+                .actions(Collections.singletonList(action)) //
                 .build();
         final Transformer transformer = factory.get(configuration);
         final String expectedCsv = IOUtils.toString(

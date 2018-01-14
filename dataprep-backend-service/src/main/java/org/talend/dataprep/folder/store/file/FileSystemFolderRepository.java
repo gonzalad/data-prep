@@ -12,21 +12,12 @@
 
 package org.talend.dataprep.folder.store.file;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
-import org.talend.dataprep.api.folder.Folder;
-import org.talend.dataprep.api.folder.FolderContentType;
-import org.talend.dataprep.api.folder.FolderEntry;
-import org.talend.dataprep.api.share.Owner;
-import org.talend.dataprep.exception.TDPException;
-import org.talend.dataprep.exception.error.CommonErrorCodes;
-import org.talend.dataprep.exception.error.DataSetErrorCodes;
-import org.talend.dataprep.folder.store.FolderRepository;
-import org.talend.dataprep.security.Security;
-import org.talend.dataprep.util.StringsHelper;
+import static org.talend.daikon.exception.ExceptionContext.build;
+import static org.talend.dataprep.api.folder.FolderBuilder.folder;
+import static org.talend.dataprep.exception.error.DataSetErrorCodes.*;
+import static org.talend.dataprep.exception.error.FolderErrorCodes.FOLDER_NOT_EMPTY;
+import static org.talend.dataprep.folder.store.FoldersRepositoriesConstants.PATH_SEPARATOR;
+import static org.talend.dataprep.folder.store.file.FileSystemUtils.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -38,28 +29,26 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import javax.annotation.PostConstruct;
 
-import static org.talend.daikon.exception.ExceptionContext.build;
-import static org.talend.dataprep.api.folder.FolderBuilder.folder;
-import static org.talend.dataprep.exception.error.DataSetErrorCodes.FOLDER_DOES_NOT_EXIST;
-import static org.talend.dataprep.exception.error.DataSetErrorCodes.ILLEGAL_FOLDER_NAME;
-import static org.talend.dataprep.exception.error.DataSetErrorCodes.UNABLE_TO_ADD_FOLDER;
-import static org.talend.dataprep.exception.error.DataSetErrorCodes.UNABLE_TO_ADD_FOLDER_ENTRY;
-import static org.talend.dataprep.exception.error.DataSetErrorCodes.UNABLE_TO_DELETE_FOLDER;
-import static org.talend.dataprep.exception.error.DataSetErrorCodes.UNABLE_TO_LIST_FOLDER_CHILDREN;
-import static org.talend.dataprep.exception.error.DataSetErrorCodes.UNABLE_TO_LIST_FOLDER_ENTRIES;
-import static org.talend.dataprep.exception.error.DataSetErrorCodes.UNABLE_TO_REMOVE_FOLDER_ENTRY;
-import static org.talend.dataprep.exception.error.DataSetErrorCodes.UNABLE_TO_RENAME_FOLDER;
-import static org.talend.dataprep.exception.error.FolderErrorCodes.FOLDER_NOT_EMPTY;
-import static org.talend.dataprep.folder.store.FoldersRepositoriesConstants.PATH_SEPARATOR;
-import static org.talend.dataprep.folder.store.file.FileSystemUtils.countSubDirectories;
-import static org.talend.dataprep.folder.store.file.FileSystemUtils.deleteFile;
-import static org.talend.dataprep.folder.store.file.FileSystemUtils.fromId;
-import static org.talend.dataprep.folder.store.file.FileSystemUtils.hasEntry;
-import static org.talend.dataprep.folder.store.file.FileSystemUtils.matches;
-import static org.talend.dataprep.folder.store.file.FileSystemUtils.toId;
-import static org.talend.dataprep.folder.store.file.FileSystemUtils.writeEntryToStream;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
+import org.talend.dataprep.api.folder.Folder;
+import org.talend.dataprep.api.folder.FolderContentType;
+import org.talend.dataprep.api.folder.FolderEntry;
+import org.talend.dataprep.api.folder.UserFolder;
+import org.talend.dataprep.api.share.Owner;
+import org.talend.dataprep.conversions.BeanConversionService;
+import org.talend.dataprep.exception.TDPException;
+import org.talend.dataprep.exception.error.CommonErrorCodes;
+import org.talend.dataprep.exception.error.DataSetErrorCodes;
+import org.talend.dataprep.folder.store.FolderRepository;
+import org.talend.dataprep.security.Security;
+import org.talend.dataprep.util.StringsHelper;
 
 /**
  * File system folder repository implementation.
@@ -67,6 +56,9 @@ import static org.talend.dataprep.folder.store.file.FileSystemUtils.writeEntryTo
 @Component("folderRepository#file")
 @ConditionalOnProperty(name = "folder.store", havingValue = "file")
 public class FileSystemFolderRepository implements FolderRepository {
+
+    @Autowired
+    private BeanConversionService conversionService;
 
     @Autowired
     private Security security;
@@ -101,7 +93,7 @@ public class FileSystemFolderRepository implements FolderRepository {
     }
 
     @Override
-    public Stream<Folder> children(String parentId) {
+    public Stream<UserFolder> children(String parentId) {
         final FolderPath parentDpPath = fromId(parentId);
         try {
             Path folderPath;
@@ -110,12 +102,13 @@ public class FileSystemFolderRepository implements FolderRepository {
             } else {
                 folderPath = pathsConverter.getRootFolder();
             }
-            Stream<Folder> children;
+            Stream<UserFolder> children;
             if (Files.notExists(folderPath)) {
                 children = Stream.empty();
             } else {
                 children = Files.list(folderPath).map(p -> toFolderIfDirectory(p, security.getUserId())) //
-                        .filter(Objects::nonNull);
+                        .filter(Objects::nonNull)
+                .map(f -> conversionService.convert(f, UserFolder.class));
             }
             return children;
         } catch (IOException e) {
@@ -316,13 +309,14 @@ public class FileSystemFolderRepository implements FolderRepository {
     }
 
     @Override
-    public Stream<Folder> searchFolders(String queryString, boolean strict) {
+    public Stream<UserFolder> searchFolders(String queryString, boolean strict) {
         try {
             return Files.walk(pathsConverter.getRootFolder()) //
                     .filter(path -> //
                             Files.isDirectory(path) //
                                     && StringsHelper.match(path.getFileName().toString(), queryString, strict)) //
-                    .map(path -> toFolder(path, security.getUserId()));
+                    .map(path -> toFolder(path, security.getUserId())) //
+                    .map(f -> conversionService.convert(f, UserFolder.class));
         } catch (IOException e) {
             throw new TDPException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
         }

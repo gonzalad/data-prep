@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -250,7 +251,7 @@ public class XlsWriterTest extends AbstractTransformerWriterTest {
             final Configuration configuration = Configuration.builder() //
                     .format(XlsFormat.XLSX) //
                     .output(outputStream) //
-                    .actions("") //
+                    .actions(Collections.emptyList()) //
                     .build();
             final Transformer exporter = factory.get(configuration);
             final InputStream inputStream = XlsWriterTest.class.getResourceAsStream(inputFileName);

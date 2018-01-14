@@ -118,7 +118,8 @@ public class TransformAPI extends APIService {
             parameters.setExportType("JSON");
             parameters.setFrom(ExportParameters.SourceType.HEAD);
 
-            inputData = clients.of(ITransformationService.class).execute(parameters);
+            clients.of(ITransformationService.class).execute(parameters);
+            inputData = getCommand(DataSetGet.class, dynamicParamsInput.getDatasetId(), false, false);
         } else {
             inputData = getCommand(DataSetGet.class, dynamicParamsInput.getDatasetId(), false, false);
         }

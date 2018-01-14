@@ -27,7 +27,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.NotImplementedException;
 import org.junit.Test;
+import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.services.transformation.PreviewParameters;
 
 import com.jayway.restassured.http.ContentType;
@@ -184,38 +186,32 @@ public class DiffTest extends TransformationServiceBaseTest {
         assertEquals("[{\"createdColumns\":[]}]", response, false);
     }
 
-    private String getSingleTransformation() throws IOException {
-        return IOUtils.toString(this.getClass().getResourceAsStream("../preview/uppercase.json"), UTF_8);
+    private List<Action> getSingleTransformation() throws IOException {
+        throw new NotImplementedException();
     }
 
-    private String getMultipleTransformationWithNewColumn() throws IOException {
-        return IOUtils.toString(this.getClass().getResourceAsStream("../preview/uppercase_copy.json"), UTF_8);
+    private List<Action> getMultipleTransformationWithNewColumn() throws IOException {
+        throw new NotImplementedException();
     }
 
-    private String getMultipleTransformationWithNewColumnBis() throws IOException {
-        return IOUtils.toString(this.getClass().getResourceAsStream("../preview/uppercase_copy_bis.json"),
-                UTF_8);
+    private List<Action> getMultipleTransformationWithNewColumnBis() throws IOException {
+        throw new NotImplementedException();
     }
 
-    private String getTransformation_TDP_1184_step_1() throws IOException {
-        return IOUtils.toString(this.getClass().getResourceAsStream("../preview/deletecolumn_split.json"), UTF_8);
+    private List<Action> getTransformation_TDP_1184_step_1() throws IOException {
+        throw new NotImplementedException();
     }
 
-    private String getTransformation_TDP_1184_step_2() throws IOException {
-        // return "{\"actions\": [ { \"action\": \"delete_column\", \"parameters\":{ \"column_id\": \"lastname\",
-        // \"scope\": \"column\" } }, { \"action\": \"split\", \"parameters\":{ \"column_id\": \"city\", \"scope\":
-        // \"column\", \"separator\":\" \", \"limit\":\"2\" } }, { \"action\": \"uppercase\",\"parameters\":{
-        // \"column_id\": \"0000\", \"scope\": \"column\" } } ]}";
-        return IOUtils.toString(this.getClass().getResourceAsStream("../preview/deletecolumn_split_uppercase.json"),
-                UTF_8);
+    private List<Action> getTransformation_TDP_1184_step_2() throws IOException {
+        throw new NotImplementedException();
     }
 
-    private String getMultipleTransformationWithoutNewColumn() throws IOException {
-        return IOUtils.toString(this.getClass().getResourceAsStream("../preview/uppercase_lowercase.json"), UTF_8);
+    private List<Action> getMultipleTransformationWithoutNewColumn() throws IOException {
+        throw new NotImplementedException();
     }
 
-    private String getMultipleTransformation() throws IOException {
-        return IOUtils.toString(this.getClass().getResourceAsStream("../preview/various_actions.json"), UTF_8);
+    private List<Action> getMultipleTransformation() throws IOException {
+        throw new NotImplementedException();
     }
 
 }

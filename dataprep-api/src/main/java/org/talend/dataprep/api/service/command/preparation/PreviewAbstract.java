@@ -16,7 +16,6 @@ package org.talend.dataprep.api.service.command.preparation;
 import static org.talend.dataprep.command.Defaults.pipeStream;
 
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -95,16 +94,16 @@ public abstract class PreviewAbstract extends GenericCommand<InputStream> {
      * @param sourceType the source type.
      * @throws JsonProcessingException if an error occurs.
      */
-    protected void setContext(Collection<Action> baseActions,
-                              Collection<Action> newActions,
+    protected void setContext(List<Action> baseActions,
+                              List<Action> newActions,
                               String datasetId,
                               String preparationId,
                               List<Integer> tdpIds,
                               ExportParameters.SourceType sourceType) throws JsonProcessingException {
 
         this.parameters = new PreviewParameters( //
-                serializeActions(baseActions), //
-                serializeActions(newActions), //
+                baseActions, //
+                newActions, //
                 datasetId, //
                 preparationId,
                 serializeIds(tdpIds),

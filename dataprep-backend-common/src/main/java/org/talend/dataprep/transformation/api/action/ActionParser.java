@@ -46,6 +46,10 @@ public class ActionParser {
         this.mapper = mapper;
     }
 
+    public List<RunnableAction> parse(List<Action> actions) {
+        return Collections.emptyList(); // TODO
+    }
+
     /**
      * Return the parsed actions ready to be run.
      *

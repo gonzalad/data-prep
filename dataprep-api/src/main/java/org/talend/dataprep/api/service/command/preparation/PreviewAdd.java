@@ -67,7 +67,7 @@ public class PreviewAdd extends PreviewAbstract {
             final Iterator<Action> iterator = actions.iterator();
             steps.stream().filter(step -> iterator.hasNext()).forEach(step -> originalActionsByStep.put(step, iterator.next()));
         }
-        final Collection<Action> originalActions = originalActionsByStep.values();
+        final List<Action> originalActions = Collections.emptyList();
 
         // modify actions to include the update
         final List<Action> modifiedActions = new ArrayList<>(originalActions);

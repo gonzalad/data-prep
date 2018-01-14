@@ -17,6 +17,7 @@ import static org.talend.dataprep.transformation.format.JsonFormat.JSON;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.io.output.TeeOutputStream;
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.talend.dataprep.api.dataset.DataSet;
+import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.api.preparation.Preparation;
 import org.talend.dataprep.cache.ContentCache;
 import org.talend.dataprep.command.dataset.DataSetGet;
@@ -105,7 +107,7 @@ public class ApplyPreparationExportStrategy extends BaseSampleExportStrategy {
             final DataSet dataSet = mapper.readerFor(DataSet.class).readValue(parser);
 
             // get the actions to apply (no preparation ==> dataset export ==> no actions)
-            final String actions = getActions(preparationId, version);
+            final List<Action> actions = getActions(preparationId, version);
 
             // create tee to broadcast to cache + service output
             final TransformationCacheKey key = cacheKeyGenerator.generateContentKey( //

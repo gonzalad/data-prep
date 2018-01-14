@@ -12,20 +12,15 @@
 
 package org.talend.dataprep.transformation.service;
 
-import static org.talend.dataprep.exception.error.PreparationErrorCodes.UNABLE_TO_READ_PREPARATION;
-
-import java.io.IOException;
-import java.io.StringWriter;
+import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.talend.daikon.client.ClientService;
-import org.talend.daikon.exception.ExceptionContext;
 import org.talend.dataprep.api.filter.FilterService;
 import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.api.preparation.Preparation;
@@ -132,31 +127,20 @@ public abstract class BaseExportStrategy {
         if (Step.ROOT_STEP.id().equals(startStepId)) {
             return getActions(preparationId, endStepId);
         }
-        String actions;
         if (StringUtils.isBlank(preparationId)) {
-            actions = "{\"actions\": []}";
+            return Collections.emptyList();
         } else {
-            try {
-                final StringWriter actionsAsString = new StringWriter();
-                final List<Action> startActions = clients.of(IPreparationService.class).getVersionedAction(preparationId, startStepId);
-                final List<Action> endActions = clients.of(IPreparationService.class).getVersionedAction(preparationId, endStepId);
-                if (endActions.size() > startActions.size()) {
-                    final Action[] filteredActions = (Action[]) ArrayUtils.subarray(endActions, startActions.length,
-                            endActions.length);
-                    LOGGER.debug("Reduced actions list from {} to {} action(s)", endActions.length, filteredActions.length);
-                    mapper.writeValue(actionsAsString, filteredActions);
-                } else {
-                    LOGGER.debug("Unable to reduce list of actions (has {})", endActions.length);
-                    mapper.writeValue(actionsAsString, endActions);
-                }
-
-                return "{\"actions\": " + actionsAsString + '}';
-            } catch (IOException e) {
-                final ExceptionContext context = ExceptionContext.build().put("id", preparationId).put("version", endStepId);
-                throw new TDPException(UNABLE_TO_READ_PREPARATION, e, context);
+            final List<Action> startActions = clients.of(IPreparationService.class).getVersionedAction(preparationId, startStepId);
+            final List<Action> endActions = clients.of(IPreparationService.class).getVersionedAction(preparationId, endStepId);
+            if (endActions.size() > startActions.size()) {
+                final List<Action> filteredActions = endActions.subList(startActions.size(), endActions.size());
+                LOGGER.debug("Reduced actions list from {} to {} action(s)", endActions.size(), filteredActions.size());
+                return filteredActions;
+            } else {
+                LOGGER.debug("Unable to reduce list of actions (has {})", endActions.size());
+                return endActions;
             }
         }
-        return actions;
     }
 
     /**

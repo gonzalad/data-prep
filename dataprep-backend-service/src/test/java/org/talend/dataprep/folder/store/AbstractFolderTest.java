@@ -25,12 +25,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.talend.ServiceBaseTest;
 import org.talend.dataprep.api.folder.Folder;
 import org.talend.dataprep.api.folder.FolderContentType;
 import org.talend.dataprep.api.folder.FolderEntry;
+import org.talend.dataprep.api.folder.UserFolder;
 import org.talend.dataprep.exception.TDPException;
 import org.talend.dataprep.exception.error.FolderErrorCodes;
 import org.talend.dataprep.security.Security;
@@ -112,7 +116,7 @@ public abstract class AbstractFolderTest extends ServiceBaseTest {
     }
 
     private List<Folder> getChildren(String folderId) {
-        try (Stream<Folder> childrenStream = getFolderRepository().children(folderId)) {
+        try (Stream<UserFolder> childrenStream = getFolderRepository().children(folderId)) {
             return childrenStream.collect(Collectors.toList());
         }
     }
@@ -562,7 +566,7 @@ public abstract class AbstractFolderTest extends ServiceBaseTest {
     }
 
     private void assertOnSearch(final String query, final boolean strict, final int foundNumber) {
-        try (Stream<Folder> folderStream = getFolderRepository().searchFolders(query, strict)) {
+        try (Stream<UserFolder> folderStream = getFolderRepository().searchFolders(query, strict)) {
             Iterable<Folder> folders = folderStream.collect(Collectors.toList());
             assertThat(Lists.newArrayList(folders)).isNotNull().isNotEmpty().hasSize(foundNumber);
         }

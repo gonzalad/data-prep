@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.talend.dataprep.api.dataset.DataSet;
 import org.talend.dataprep.api.dataset.DataSetMetadata;
+import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.api.preparation.Preparation;
 import org.talend.dataprep.api.preparation.PreparationMessage;
 import org.talend.dataprep.api.preparation.Step;
@@ -106,7 +107,7 @@ public class OptimizedExportStrategy extends BaseSampleExportStrategy {
             dataSet.setMetadata(metadata);
 
             // get the actions to apply (no preparation ==> dataset export ==> no actions)
-            final String actions = getActions(preparationId, previousVersion, version);
+            final List<Action> actions = getActions(preparationId, previousVersion, version);
             final PreparationMessage preparation = getPreparation(preparationId);
             preparation.setSteps(getMatchingSteps(preparation.getSteps(), previousVersion, version));
 

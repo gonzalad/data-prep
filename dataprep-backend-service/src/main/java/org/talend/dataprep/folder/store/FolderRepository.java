@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 import org.talend.dataprep.api.folder.Folder;
 import org.talend.dataprep.api.folder.FolderContentType;
 import org.talend.dataprep.api.folder.FolderEntry;
+import org.talend.dataprep.api.folder.UserFolder;
 import org.talend.dataprep.exception.TDPException;
 
 
@@ -60,7 +61,7 @@ public interface FolderRepository {
      * visible by current user.
      * @param folderId the parent folder in the format /ffo/blab/mm or <code>null</code> for root folder
      */
-    Stream<Folder> children(String folderId);
+    Stream<UserFolder> children(String folderId);
 
     /**
      * Remove folder and content recursively only if no entry is found. Throws a {@link TDPException} with
@@ -148,7 +149,7 @@ public interface FolderRepository {
      * @param strict strict mode means the name is the full name
      * @return A {@link Iterable} of {@link Folder} with the query string in the name
      */
-    Stream<Folder> searchFolders(String queryString, boolean strict);
+    Stream<UserFolder> searchFolders(String queryString, boolean strict);
 
     /**
      * Return the folder that holds the given content id and content type.

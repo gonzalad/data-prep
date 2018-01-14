@@ -14,6 +14,7 @@ package org.talend.dataprep.transformation.api.transformer.configuration;
 
 import java.io.OutputStream;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -22,6 +23,7 @@ import java.util.function.Supplier;
 import org.apache.commons.lang.StringUtils;
 import org.talend.dataprep.api.dataset.RowMetadata;
 import org.talend.dataprep.api.dataset.row.DataSetRow;
+import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.api.preparation.PreparationMessage;
 import org.talend.dataprep.format.export.ExportFormat;
 import org.talend.dataprep.services.transformation.ExportParameters;
@@ -53,9 +55,9 @@ public class Configuration {
     private final ExportParameters.SourceType sourceType;
 
     /**
-     * The actions in JSON string format
+     * The actions in action objects.
      */
-    private final String actions;
+    private final List<Action> actions;
 
     /**
      * The arguments for format
@@ -89,7 +91,7 @@ public class Configuration {
                             final Supplier<Node> monitorSupplier, //
                             final ExportParameters.SourceType sourceType, //
                             final String format, //
-                            final String actions, //
+                            final List<Action> actions, //
                             final Map<String, String> arguments, //
                             final PreparationMessage preparation, //
                             final String stepId, //
@@ -138,7 +140,7 @@ public class Configuration {
     /**
      * @return The actions (as JSON string) to apply in transformation.
      */
-    public String getActions() {
+    public List<Action> getActions() {
         return actions;
     }
 
@@ -213,9 +215,9 @@ public class Configuration {
         private ExportParameters.SourceType sourceType = ExportParameters.SourceType.HEAD;
 
         /**
-         * The actions in JSON string format
+         * The actions (using action objects).
          */
-        private String actions = StringUtils.EMPTY;
+        private List<Action> actions = Collections.emptyList();
 
         /**
          * The actions in Map
@@ -299,7 +301,7 @@ public class Configuration {
          * @param actions The actions in JSON string format.
          * @return The mapper
          */
-        public Builder actions(final String actions) {
+        public Builder actions(final List<Action> actions) {
             this.actions = actions;
             return this;
         }

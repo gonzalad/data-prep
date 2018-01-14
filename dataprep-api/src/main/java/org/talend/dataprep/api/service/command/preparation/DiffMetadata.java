@@ -15,12 +15,9 @@ package org.talend.dataprep.api.service.command.preparation;
 import static java.util.stream.Collectors.toList;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
-import static org.talend.daikon.exception.ExceptionContext.withBuilder;
 import static org.talend.dataprep.command.Defaults.pipeStream;
-import static org.talend.dataprep.exception.error.PreparationErrorCodes.UNABLE_TO_READ_PREPARATION;
 import static org.talend.dataprep.services.transformation.ExportParameters.SourceType.HEAD;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,27 +66,23 @@ public class DiffMetadata extends GenericCommand<InputStream> {
             final List<Action> actionsToAdd) {
         // prepare the preview parameters out of the preparation actions
         final List<PreviewParameters> previewParameters = IntStream.range(0, actionsToAdd.size()).mapToObj((index) -> {
-            try {
-                // base actions = original actions + actions to add from 0 to index
-                final List<Action> previousActionsToAdd = actionsToAdd.subList(0, index);
-                final List<Action> baseActions = new ArrayList<>(originalActions);
-                baseActions.addAll(previousActionsToAdd);
+            // base actions = original actions + actions to add from 0 to index
+            final List<Action> previousActionsToAdd = actionsToAdd.subList(0, index);
+            final List<Action> baseActions = new ArrayList<>(originalActions);
+            baseActions.addAll(previousActionsToAdd);
 
-                // diff actions actions = base actions + the action to add for diff
-                final Action singleActionToAdd = actionsToAdd.get(index);
-                final List<Action> diffActions = new ArrayList<>(baseActions);
-                diffActions.add(singleActionToAdd);
+            // diff actions actions = base actions + the action to add for diff
+            final Action singleActionToAdd = actionsToAdd.get(index);
+            final List<Action> diffActions = new ArrayList<>(baseActions);
+            diffActions.add(singleActionToAdd);
 
-                return new PreviewParameters( //
-                        serializeActions(baseActions), //
-                        serializeActions(diffActions), //
-                        dataSetId, //
-                        null, //
-                        null, //
-                        HEAD);
-            } catch (IOException e) {
-                throw new TDPException(UNABLE_TO_READ_PREPARATION, e, withBuilder().put("id", preparationId).build());
-            }
+            return new PreviewParameters( //
+                    baseActions, //
+                    diffActions, //
+                    dataSetId, //
+                    null, //
+                    null, //
+                    HEAD);
         }).collect(toList());
 
         // create the http action to perform

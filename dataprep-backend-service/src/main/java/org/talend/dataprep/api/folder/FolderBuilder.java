@@ -106,9 +106,6 @@ public class FolderBuilder {
         folder.setPath(path);
         folder.setName(name);
         folder.setOwnerId(ownerId);
-        folder.setOwner(owner);
-        folder.setSharedFolder(shared);
-        folder.setRoles(roles);
         folder.setNbPreparations(nbPreparations);
         folder.setCreationDate(creationDate);
         folder.setLastModificationDate(lastModificationDate);

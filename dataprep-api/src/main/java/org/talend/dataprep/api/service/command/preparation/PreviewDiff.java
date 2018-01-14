@@ -76,7 +76,7 @@ public class PreviewDiff extends PreviewAbstract {
         steps.stream().filter(step -> previewActionsIterator.hasNext()).forEach(step -> previewActions.put(step.id(), previewActionsIterator.next()));
 
         // execute transformation preview with content and the 2 transformations
-        setContext(originalActions.values(), previewActions.values(), dataSetId, input.getPreparationId(), input.getTdpIds(), input.getSourceType());
+        setContext(Collections.emptyList(), Collections.emptyList(), dataSetId, input.getPreparationId(), input.getTdpIds(), input.getSourceType());
         return super.run();
     }
 

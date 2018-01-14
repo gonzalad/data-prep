@@ -13,16 +13,20 @@
 
 package org.talend.dataprep.services.transformation;
 
+import java.util.List;
+
+import org.talend.dataprep.api.preparation.Action;
+
 /**
  * Bean that holds all required data to perform a preview.
  */
 public class PreviewParameters {
 
     /** Old actions to perform to get the base state of the preview. */
-    private String baseActions;
+    private List<Action> baseActions;
 
     /** New actions to perform to get the new state for the diff. */
-    private String newActions;
+    private List<Action> newActions;
 
     /** List of row ids to perform the preview on. */
     private String tdpIds;
@@ -53,7 +57,7 @@ public class PreviewParameters {
      * @param tdpIds List of row ids to perform the preview on.
      * @param sourceType The source type.
      */
-    public PreviewParameters(String baseActions, String newActions, String datasetId, String preparationId, String tdpIds, ExportParameters.SourceType sourceType) {
+    public PreviewParameters(List<Action> baseActions, List<Action> newActions, String datasetId, String preparationId, String tdpIds, ExportParameters.SourceType sourceType) {
         this();
         this.baseActions = baseActions;
         this.newActions = newActions;
@@ -66,14 +70,14 @@ public class PreviewParameters {
     /**
      * @return the BaseActions
      */
-    public String getBaseActions() {
+    public List<Action> getBaseActions() {
         return baseActions;
     }
 
     /**
      * @return the NewActions
      */
-    public String getNewActions() {
+    public List<Action> getNewActions() {
         return newActions;
     }
 

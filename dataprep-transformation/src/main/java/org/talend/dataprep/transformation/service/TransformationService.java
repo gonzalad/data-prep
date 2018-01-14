@@ -49,6 +49,7 @@ import org.talend.dataprep.api.dataset.DataSetMetadata;
 import org.talend.dataprep.api.dataset.RowMetadata;
 import org.talend.dataprep.api.dataset.row.Flag;
 import org.talend.dataprep.api.dataset.statistics.SemanticDomain;
+import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.api.preparation.Preparation;
 import org.talend.dataprep.api.preparation.Step;
 import org.talend.dataprep.api.preparation.StepDiff;
@@ -447,7 +448,7 @@ public class TransformationService extends BaseTransformationService implements 
         return stepDiff;
     }
 
-    private void applyActionsOnMetadata(RowMetadata metadata, String actionsAsJson) {
+    private void applyActionsOnMetadata(RowMetadata metadata, List<Action> actionsAsJson) {
         List<RunnableAction> actions = actionParser.parse(actionsAsJson);
         TransformationContext transformationContext = new TransformationContext();
         try {
@@ -470,8 +471,8 @@ public class TransformationService extends BaseTransformationService implements 
      * @param dataSet The dataset (column metadata and records)
      * @param output The output stream where to write the result
      */
-    private void executePreview(final String actions, final String referenceActions, final String indexes,
-            final DataSet dataSet, final OutputStream output) {
+    private void executePreview(final List<Action> actions, final List<Action> referenceActions, final String indexes,
+                                final DataSet dataSet, final OutputStream output) {
         final PreviewConfiguration configuration = PreviewConfiguration
                 .preview() //
                 .withActions(actions) //

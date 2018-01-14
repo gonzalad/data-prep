@@ -421,12 +421,10 @@ public class DataSetService extends BaseDataSetService implements IDataSetServic
         }
         if (!metadata.getLifecycle().schemaAnalyzed()) {
             HttpResponseContext.status(HttpStatus.ACCEPTED);
-            return DataSet.empty();
+            return new DataSetMetadata();
         }
-        DataSet dataSet = new DataSet();
-        dataSet.setMetadata(conversionService.convert(metadata, UserDataSetMetadata.class));
-        LOG.info("found dataset {} for #{}", dataSet.getMetadata().getName(), dataSetId);
-        return dataSet;
+        LOG.info("found dataset {} for #{}", metadata.getName(), dataSetId);
+        return conversionService.convert(metadata, UserDataSetMetadata.class);
     }
 
     @Override
@@ -453,8 +451,7 @@ public class DataSetService extends BaseDataSetService implements IDataSetServic
     @ApiOperation(value = "Copy a data set", produces = TEXT_PLAIN_VALUE, notes = "Copy a new data set based on the given id. Returns the id of the newly created data set.")
     @Timed
     public String copy(@PathVariable(value = "id") @ApiParam(name = "id", value = "Id of the data set to clone") String dataSetId,
-                       @ApiParam(value = "The name of the cloned dataset.") @RequestParam(required = false) String copyName)
-            throws IOException {
+                       @ApiParam(value = "The name of the cloned dataset.") @RequestParam(required = false) String copyName) {
 
         if (copyName != null) {
             checkDataSetName(copyName);
@@ -505,6 +502,8 @@ public class DataSetService extends BaseDataSetService implements IDataSetServic
             LOG.debug(marker, "Storing content...");
             try (InputStream content = contentStore.getAsRaw(original)) {
                 contentStore.storeAsRaw(target, content);
+            } catch (IOException e) {
+                throw new TDPException(DataSetErrorCodes.UNABLE_TO_CREATE_OR_UPDATE_DATASET, e);
             }
 
             LOG.debug(marker, "Content stored.");

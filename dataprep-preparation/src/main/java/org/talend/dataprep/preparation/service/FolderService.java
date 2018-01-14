@@ -28,11 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.talend.daikon.exception.ExceptionContext;
 import org.talend.dataprep.api.folder.Folder;
 import org.talend.dataprep.api.folder.FolderInfo;
 import org.talend.dataprep.api.folder.FolderTreeNode;
+import org.talend.dataprep.api.folder.UserFolder;
 import org.talend.dataprep.exception.TDPException;
 import org.talend.dataprep.folder.store.FolderRepository;
 import org.talend.dataprep.metrics.Timed;
@@ -65,12 +65,12 @@ public class FolderService implements IFolderService {
     @RequestMapping(value = "/folders", method = GET)
     @ApiOperation(value = "List children folders of the parameter if null list root children.", notes = "List all child folders of the one as parameter")
     @Timed
-    public Stream<Folder> list(@RequestParam(required = false) @ApiParam(value = "Parent id filter.") String parentId,
-                               @RequestParam(defaultValue = "lastModificationDate") @ApiParam(value = "Sort key (by name or date).") Sort sort,
-                               @RequestParam(defaultValue = "desc") @ApiParam(value = "Order for sort key (desc or asc).") Order order) {
+    public Stream<UserFolder> list(@RequestParam(required = false) @ApiParam(value = "Parent id filter.") String parentId,
+                                   @RequestParam(defaultValue = "lastModificationDate") @ApiParam(value = "Sort key (by name or date).") Sort sort,
+                                   @RequestParam(defaultValue = "desc") @ApiParam(value = "Order for sort key (desc or asc).") Order order) {
     //@formatter:on
 
-        Stream<Folder> children;
+        Stream<UserFolder> children;
         if (parentId != null) {
             if (!folderRepository.exists(parentId)) {
                 throw new TDPException(FOLDER_NOT_FOUND, build().put("id", parentId));
@@ -114,10 +114,10 @@ public class FolderService implements IFolderService {
     @RequestMapping(value = "/folders/search", method = GET)
     @ApiOperation(value = "Search Folders with parameter as part of the name")
     @Timed
-    public Stream<Folder> search(@RequestParam(required = false, defaultValue = "") final String name,
-                                 @RequestParam(required = false, defaultValue = "false") final Boolean strict,
-                                 @RequestParam(required = false) final String path) {
-        Stream<Folder> folders;
+    public Stream<UserFolder> search(@RequestParam(required = false, defaultValue = "") final String name,
+                                     @RequestParam(required = false, defaultValue = "false") final Boolean strict,
+                                     @RequestParam(required = false) final String path) {
+        Stream<UserFolder> folders;
         if (path == null) {
             folders = folderRepository.searchFolders(name, strict);
         } else {
@@ -139,7 +139,7 @@ public class FolderService implements IFolderService {
     @RequestMapping(value = "/folders", method = PUT)
     @ApiOperation(value = "Create a Folder", notes = "Create a folder")
     @Timed
-    public StreamingResponseBody addFolder(@RequestParam(required = false) String parentId, @RequestParam String path) {
+    public Folder addFolder(@RequestParam(required = false) String parentId, @RequestParam String path) {
         if (parentId == null) {
             parentId = folderRepository.getHome().getId();
         }
@@ -172,7 +172,7 @@ public class FolderService implements IFolderService {
     }
 
     private FolderTreeNode getTree(final Folder root) {
-        try (final Stream<Folder> children = folderRepository.children(root.getId())) {
+        try (final Stream<UserFolder> children = folderRepository.children(root.getId())) {
             final List<FolderTreeNode> childrenSubtrees = StreamSupport.stream(children.spliterator(), false).map(this::getTree)
                     .collect(toList());
             return new FolderTreeNode(root, childrenSubtrees);

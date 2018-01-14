@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.talend.daikon.annotation.Service;
 import org.talend.dataprep.api.folder.Folder;
 import org.talend.dataprep.api.folder.FolderInfo;
 import org.talend.dataprep.api.folder.FolderTreeNode;
+import org.talend.dataprep.api.folder.UserFolder;
 import org.talend.dataprep.metrics.Timed;
 import org.talend.dataprep.util.SortAndOrderHelper.Order;
 import org.talend.dataprep.util.SortAndOrderHelper.Sort;
@@ -29,7 +29,7 @@ public interface IFolderService {
     //@formatter:off
     @RequestMapping(value = "/folders", method = GET)
     @Timed
-    Stream<Folder> list(@RequestParam(required = false) String parentId, //
+    Stream<UserFolder> list(@RequestParam(required = false) String parentId, //
                         @RequestParam(defaultValue = "lastModificationDate") Sort sort, //
                         @RequestParam(defaultValue = "desc") Order order);
 
@@ -52,7 +52,7 @@ public interface IFolderService {
      */
     @RequestMapping(value = "/folders/search", method = GET)
     @Timed
-    Stream<Folder> search(@RequestParam(required = false, defaultValue = "") String name, //
+    Stream<UserFolder> search(@RequestParam(required = false, defaultValue = "") String name, //
                           @RequestParam(required = false, defaultValue = "false") Boolean strict, //
                           @RequestParam(required = false) String path);
 
@@ -64,7 +64,7 @@ public interface IFolderService {
      */
     @RequestMapping(value = "/folders", method = PUT)
     @Timed
-    StreamingResponseBody addFolder(@RequestParam(required = false) String parentId, @RequestParam String path);
+    Folder addFolder(@RequestParam(required = false) String parentId, @RequestParam String path);
 
     /**
      * Remove the folder. Throws an exception if the folder, or one of its sub folders, contains an entry.

@@ -76,18 +76,16 @@ public class Import {
 
     public String getLabel() {
         if (StringUtils.isBlank(this.label)) {
-            return DataprepBundle.message("import." + locationType + ".label");
-        } else {
-            return this.label;
+            // return DataprepBundle.message("import." + locationType + ".label");
         }
+        return this.label;
     }
 
     public String getTitle() {
         if (StringUtils.isBlank(this.title)) {
-            return DataprepBundle.message("import." + locationType + ".title");
-        } else {
-            return this.title;
+            // return DataprepBundle.message("import." + locationType + ".title");
         }
+        return this.title;
     }
 
     private void setLabel(String label) {

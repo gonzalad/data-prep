@@ -54,7 +54,7 @@ public class ActionParserTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void should_not_accept_null_actions() {
-        actionParser.parse(null);
+        actionParser.parse((String) null);
     }
 
     @Test(expected = TalendRuntimeException.class)

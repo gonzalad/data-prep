@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.exception.TDPException;
 import org.talend.dataprep.exception.error.CommonErrorCodes;
 
@@ -25,12 +26,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class PreviewConfiguration extends Configuration {
 
-    private final String previewActions;
+    private final List<Action> previewActions;
 
     /** Indexes of rows (used in diff). */
     private final List<Long> indexes;
 
-    protected PreviewConfiguration(Configuration configuration, String previewActions, List<Long> indexes) {
+    protected PreviewConfiguration(Configuration configuration, List<Action> previewActions, List<Long> indexes) {
         super(configuration.output(), configuration.getFilter(), configuration.getOutFilter(), configuration.getMonitor(), configuration.getSourceType(), configuration.formatId(), configuration.getActions(), configuration.getArguments(),
                 configuration.getPreparation(), configuration.stepId(), false, false, configuration.volume(), null);
         this.previewActions = previewActions;
@@ -45,11 +46,11 @@ public class PreviewConfiguration extends Configuration {
         return indexes;
     }
 
-    public String getReferenceActions() {
+    public List<Action> getReferenceActions() {
         return super.getActions();
     }
 
-    public String getPreviewActions() {
+    public List<Action> getPreviewActions() {
         return previewActions;
     }
 
@@ -61,7 +62,7 @@ public class PreviewConfiguration extends Configuration {
         /** Indexes of rows. */
         private List<Long> indexes;
 
-        private String previewActions;
+        private List<Action> previewActions;
 
         private Configuration reference;
 
@@ -88,7 +89,7 @@ public class PreviewConfiguration extends Configuration {
             return this;
         }
 
-        public Builder withActions(final String previewActions) {
+        public Builder withActions(final List<Action> previewActions) {
             this.previewActions = previewActions;
             return this;
         }

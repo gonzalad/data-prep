@@ -14,10 +14,7 @@
 package org.talend.dataprep.api.service.command.preparation;
 
 import java.io.InputStream;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.context.annotation.Scope;
@@ -73,7 +70,7 @@ public class PreviewUpdate extends PreviewAbstract {
         }
 
         // execute transformation preview with content and the 2 transformations
-        setContext(originalActions.values(), modifiedActions.values(), dataSetId, parameters.getPreparationId(), parameters.getTdpIds(), parameters.getSourceType());
+        setContext(Collections.emptyList(), Collections.emptyList(), dataSetId, parameters.getPreparationId(), parameters.getTdpIds(), parameters.getSourceType());
         return super.run();
     }
 

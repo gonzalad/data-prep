@@ -588,10 +588,12 @@ public class PreparationService implements IPreparationService {
         LOGGER.debug("Adding action to preparation...");
         Preparation preparation = getPreparation(preparationId);
         List<Action> actions = getVersionedAction(preparationId, "head");
-        StepDiff actionCreatedColumns = stepDiffDelegate.computeCreatedColumns(preparation.getRowMetadata(),
-                buildActions(actions), buildActions(step.getActions()));
-        step.setDiff(actionCreatedColumns);
-        appendSteps(preparationId, Collections.singletonList(step));
+        for (AppendStep appendStep : step) {
+            StepDiff actionCreatedColumns = stepDiffDelegate.computeCreatedColumns(preparation.getRowMetadata(),
+                    buildActions(actions), buildActions(appendStep.getActions()));
+            appendStep.setDiff(actionCreatedColumns);
+            appendSteps(preparationId, Collections.singletonList(appendStep));
+        }
         LOGGER.debug("Added action to preparation.");
     }
 
@@ -611,7 +613,7 @@ public class PreparationService implements IPreparationService {
         return builtActions;
     }
 
-    private void appendSteps(String preparationId, final List<AppendStep> stepsToAppend) {
+    public void appendSteps(String preparationId, final List<AppendStep> stepsToAppend) {
         stepsToAppend.forEach(this::checkActionStepConsistency);
 
         LOGGER.debug("Adding actions to preparation #{}", preparationId);

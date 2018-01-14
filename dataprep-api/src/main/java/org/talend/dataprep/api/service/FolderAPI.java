@@ -21,11 +21,11 @@ import java.util.stream.Stream;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.talend.daikon.client.ClientService;
 import org.talend.dataprep.api.folder.Folder;
 import org.talend.dataprep.api.folder.FolderInfo;
 import org.talend.dataprep.api.folder.FolderTreeNode;
+import org.talend.dataprep.api.folder.UserFolder;
 import org.talend.dataprep.dataset.DataSetMetadataBuilder;
 import org.talend.dataprep.exception.TDPException;
 import org.talend.dataprep.exception.error.APIErrorCodes;
@@ -57,7 +57,7 @@ public class FolderAPI extends APIService {
     @ApiOperation(value = "List folders. Optional filter on parent ID may be supplied.",
             produces = APPLICATION_JSON_VALUE)
     @Timed
-    public Stream<Folder> listFolders(@RequestParam(required = false) String parentId) {
+    public Stream<UserFolder> listFolders(@RequestParam(required = false) String parentId) {
         try {
             return clients.of(IFolderService.class).list(parentId, Sort.LAST_MODIFICATION_DATE, Order.DESC);
         } catch (Exception e) {
@@ -90,8 +90,8 @@ public class FolderAPI extends APIService {
     @RequestMapping(value = "/api/folders", method = PUT)
     @ApiOperation(value = "Add a folder.", produces = APPLICATION_JSON_VALUE)
     @Timed
-    public StreamingResponseBody addFolder(@RequestParam(required = false) final String parentId,
-            @RequestParam final String path) {
+    public Folder addFolder(@RequestParam(required = false) final String parentId,
+                            @RequestParam final String path) {
         try {
             return clients.of(IFolderService.class).addFolder(parentId, path);
         } catch (Exception e) {
@@ -137,8 +137,8 @@ public class FolderAPI extends APIService {
     @RequestMapping(value = "/api/folders/search", method = GET, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Search Folders with parameter as part of the name", produces = APPLICATION_JSON_VALUE)
     @Timed
-    public Stream<Folder> search(@RequestParam(required = false) final String name,
-                                 @RequestParam(required = false) final Boolean strict, @RequestParam(required = false) final String path) {
+    public Stream<UserFolder> search(@RequestParam(required = false) final String name,
+                                     @RequestParam(required = false) final Boolean strict, @RequestParam(required = false) final String path) {
         return clients.of(IFolderService.class).search(name, strict, path);
     }
 
@@ -169,7 +169,7 @@ public class FolderAPI extends APIService {
     }
 
     class PreparationByFolderResult {
-        public Stream<Folder> folders;
+        public Stream<UserFolder> folders;
         public Stream<UserPreparation> preparations;
     }
 }

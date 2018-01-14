@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 import org.talend.dataprep.api.dataset.DataSet;
 import org.talend.dataprep.api.dataset.RowMetadata;
 import org.talend.dataprep.api.dataset.row.DataSetRow;
+import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.dataset.StatisticsAdapter;
 import org.talend.dataprep.quality.AnalyzerService;
 import org.talend.dataprep.transformation.api.action.ActionParser;
@@ -84,8 +85,8 @@ class PipelineDiffTransformer implements Transformer {
 
         // Build diff pipeline
         final Node diffWriterNode = new DiffWriterNode(writer);
-        final String referenceActions = previewConfiguration.getReferenceActions();
-        final String previewActions = previewConfiguration.getPreviewActions();
+        final List<Action> referenceActions = previewConfiguration.getReferenceActions();
+        final List<Action> previewActions = previewConfiguration.getPreviewActions();
         final Pipeline referencePipeline = buildPipeline(rowMetadata, referenceActions);
         final Pipeline previewPipeline = buildPipeline(rowMetadata, previewActions);
 
@@ -126,7 +127,7 @@ class PipelineDiffTransformer implements Transformer {
         };
     }
 
-    private Pipeline buildPipeline(RowMetadata rowMetadata, String actions) {
+    private Pipeline buildPipeline(RowMetadata rowMetadata, List<Action> actions) {
         return Pipeline.Builder.builder() //
                 .withAnalyzerService(analyzerService) //
                 .withActionRegistry(actionRegistry) //

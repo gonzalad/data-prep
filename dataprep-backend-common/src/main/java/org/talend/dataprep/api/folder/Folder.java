@@ -16,14 +16,12 @@ package org.talend.dataprep.api.folder;
 import java.io.Serializable;
 import java.util.Objects;
 
-import org.talend.dataprep.api.share.SharedResource;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Model a folder.
  */
-public class Folder implements Serializable, SharedResource {
+public class Folder implements Serializable {
 
     /** Serialization UID. */
     private static final long serialVersionUID = 1L;
@@ -53,11 +51,6 @@ public class Folder implements Serializable, SharedResource {
     /** Number of preparations held in this folder. */
     private long nbPreparations;
 
-
-
-    /**
-     * Default empty constructor.
-     */
     public Folder() {
         this.creationDate = System.currentTimeMillis();
         this.lastModificationDate = this.creationDate;
@@ -162,12 +155,9 @@ public class Folder implements Serializable, SharedResource {
         this.parentId = parentId;
     }
 
-
-
     /**
      * @return the OwnerId
      */
-    @Override
     public String getOwnerId() {
         return ownerId;
     }
@@ -178,8 +168,6 @@ public class Folder implements Serializable, SharedResource {
     public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
     }
-
-
 
     /**
      * @see Object#equals(Object)
