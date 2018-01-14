@@ -12,8 +12,6 @@
 
 package org.talend.dataprep.exception.error;
 
-import static org.springframework.http.HttpStatus.*;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,7 +21,7 @@ import org.talend.daikon.exception.error.ErrorCode;
 
 public enum CommonErrorCodes implements ErrorCode {
     UNEXPECTED_EXCEPTION(500),
-    UNEXPECTED_CONTENT(BAD_REQUEST.value(), "message"),
+    UNEXPECTED_CONTENT(400, "message"),
     UNEXPECTED_SERVICE_EXCEPTION(500, "message"),
     UNABLE_TO_PARSE_JSON(400),
     UNABLE_TO_GET_SERVICE_VERSION(400),
@@ -54,56 +52,56 @@ public enum CommonErrorCodes implements ErrorCode {
     /**
      * Unable to connect TAC: address specified in configuration is most likely incorrect and leads to a connection timeout.
      */
-    UNABLE_TO_CONNECT_TO_TAC(BAD_GATEWAY.value()),
-    TAC_SERVER_UNREACHABLE(BAD_GATEWAY.value()),
-    TIC_SERVER_UNREACHABLE(BAD_GATEWAY.value()),
+    UNABLE_TO_CONNECT_TO_TAC(502),
+    TAC_SERVER_UNREACHABLE(502),
+    TIC_SERVER_UNREACHABLE(502),
     /**
      * Unable to connect TIC: address specified in configuration is most likely incorrect and leads to a connection timeout.
      */
-    UNABLE_TO_CONNECT_TO_TIC(BAD_GATEWAY.value()),
+    UNABLE_TO_CONNECT_TO_TIC(502),
     /**
      * Error thrown when data prep fails to list available tasks (for running remote jobs).
      */
-    UNABLE_TO_LIST_REMOTE_TASKS(INTERNAL_SERVER_ERROR.value(), "error"),
+    UNABLE_TO_LIST_REMOTE_TASKS(500, "error"),
     /**
      * Invalid credentials: TAC doesn't recognize the user/password as valid ones.
      */
-    INVALID_TAC_CREDENTIALS(BAD_GATEWAY.value()),
+    INVALID_TAC_CREDENTIALS(502),
     /**
      * TAC rights are not sufficient to complete operation∕.
      */
-    INSUFFICIENT_RIGHTS_TAC_CREDENTIAL(BAD_GATEWAY.value()),
+    INSUFFICIENT_RIGHTS_TAC_CREDENTIAL(502),
     /**
      * TAC rights are not sufficient to get the tasks list∕.
      */
-    INSUFFICIENT_RIGHTS_TAC_LIST_TASKS(BAD_GATEWAY.value()),
-    INSUFFICIENT_RIGHTS_TIC_LIST_FLOWS(BAD_GATEWAY.value()),
+    INSUFFICIENT_RIGHTS_TAC_LIST_TASKS(502),
+    INSUFFICIENT_RIGHTS_TIC_LIST_FLOWS(502),
     /**
      * Error thrown when data prep fails to run remote job.
      */
-    UNABLE_TO_RUN_REMOTE_JOB(BAD_GATEWAY.value()),
+    UNABLE_TO_RUN_REMOTE_JOB(502),
     /**
      * Error thrown when receiving content from a job takes too long.
      */
-    NO_DATA_RECEIVED_FROM_TAC(BAD_GATEWAY.value()),
+    NO_DATA_RECEIVED_FROM_TAC(502),
     /**
      * Error thrown when receiving content from a flow takes too long.
      */
-    NO_DATA_RECEIVED_FROM_TIC(BAD_GATEWAY.value()),
-    UNABLE_TO_LIST_REMOTE_EXECUTABLES(INTERNAL_SERVER_ERROR.value()),
-    UNABLE_TO_EXECUTE_REMOTE_EXECUTABLE(INTERNAL_SERVER_ERROR.value()),
+    NO_DATA_RECEIVED_FROM_TIC(502),
+    UNABLE_TO_LIST_REMOTE_EXECUTABLES(500),
+    UNABLE_TO_EXECUTE_REMOTE_EXECUTABLE(500),
     /**
      * Job is already running: TAC only allows one run of the task.
      */
-    JOB_ALREADY_RUNNING(BAD_GATEWAY.value()),
+    JOB_ALREADY_RUNNING(502),
     /**
      * If we are unable to connect to streams
      */
-    UNABLE_TO_CONNECT_TO_STREAMS(BAD_GATEWAY.value()),
+    UNABLE_TO_CONNECT_TO_STREAMS(502),
     /**
      * If unable to access SCIM server whatever the reason. It will encapsulate the {@link org.talend.iam.common.exception.SCIMException}.
      */
-    SCIM_CLIENT_ERROR(INTERNAL_SERVER_ERROR.value(), "message");
+    SCIM_CLIENT_ERROR(500, "message");
 
     /** The http status to use. */
     private int httpStatus;

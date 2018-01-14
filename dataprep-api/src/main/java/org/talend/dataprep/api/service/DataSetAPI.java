@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.collections4.IterableUtils;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -315,16 +314,11 @@ public class DataSetAPI extends APIService {
         return () -> {
             LOG.debug("Listing compatible preparations...");
             // get the list of compatible data sets
-            final List<UserDataSetMetadata> dataSets = IterableUtils.toList(clients.of(IDataSetService.class).listCompatibleDatasets(dataSetId, sort, order));
+            final List<String> dataSets = IterableUtils.toList(clients.of(IDataSetService.class).listCompatibleDatasets(dataSetId, sort, order)).stream().map(d -> d.getId()).collect(Collectors.toList());
             // get list of preparations
             final Stream<UserPreparation> stream =
                     clients.of(IPreparationService.class).listAll("", "", "", sort, order);
-            return stream.filter(p -> dataSets
-                    .flatMapIterable(l -> l) //
-                    .map(DataSetMetadata::getId) //
-                    .any(id -> StringUtils.equals(id, p.getDataSetId()) || dataSetId.equals(p.getDataSetId())) //
-                    .block() //
-            );
+            return stream.filter(p -> dataSets.contains(p.getDataSetId()));
         };
     }
 
@@ -350,7 +344,7 @@ public class DataSetAPI extends APIService {
         // Asks transformation service for suggested actions for column type and domain...
         final List<ActionForm> suggestions = clients.of(ITransformationService.class).suggest(metadata);
         // ... also adds lookup actions
-        clients.of(ITransformationService.class).suggest()
+        // TODO
         // Returns actions
         return suggestions;
     }

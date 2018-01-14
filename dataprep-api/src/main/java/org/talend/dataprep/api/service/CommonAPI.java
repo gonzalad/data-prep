@@ -14,13 +14,12 @@ package org.talend.dataprep.api.service;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections4.IterableUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,14 +29,11 @@ import org.talend.daikon.exception.error.ErrorCode;
 import org.talend.dataprep.api.type.Type;
 import org.talend.dataprep.exception.error.APIErrorCodes;
 import org.talend.dataprep.exception.error.CommonErrorCodes;
-import org.talend.dataprep.exception.json.JsonErrorCodeDescription;
 import org.talend.dataprep.metrics.Timed;
 import org.talend.dataprep.services.dataset.IDataSetService;
 import org.talend.dataprep.services.preparation.IPreparationService;
 import org.talend.dataprep.services.transformation.ITransformationService;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.ApiOperation;
@@ -56,41 +52,23 @@ public class CommonAPI extends APIService {
 
     /**
      * Describe the supported error codes.
-     *
-     * @param output the http response.
      */
     @RequestMapping(value = "/api/errors", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get all supported errors.", notes = "Returns the list of all supported errors.")
     @Timed
-    public void listErrors(final OutputStream output) throws IOException {
+    public List<ErrorCode> listErrors() {
 
         LOG.debug("Listing supported error codes");
 
-        JsonFactory factory = new JsonFactory();
-        JsonGenerator generator = factory.createGenerator(output);
-        generator.setCodec(mapper);
-
-        // start the errors array
-        generator.writeStartArray();
-
         // write the direct known errors
-        writeErrorsFromEnum(generator, CommonErrorCodes.values());
-        writeErrorsFromEnum(generator, APIErrorCodes.values());
+        List<ErrorCode> allErrors = new ArrayList<>();
+        allErrors.addAll(Arrays.asList(CommonErrorCodes.values()));
+        allErrors.addAll(Arrays.asList(APIErrorCodes.values()));
+        allErrors.addAll(IterableUtils.toList(clients.of(IDataSetService.class).listErrors()));
+        allErrors.addAll(IterableUtils.toList(clients.of(IPreparationService.class).listErrors()));
+        allErrors.addAll(IterableUtils.toList(clients.of(ITransformationService.class).listErrors()));
 
-        // get dataset api errors
-        final Iterable<JsonErrorCodeDescription> datasetErrors = clients.of(IDataSetService.class).listErrors();
-
-        // get preparation api errors
-        final Iterable<JsonErrorCodeDescription> preparationErrors = clients.of(IPreparationService.class).listErrors();
-
-        // get transformation api errors
-        final Iterable<JsonErrorCodeDescription> transformationErrors = clients.of(ITransformationService.class).listErrors();
-
-        ... To complete ...
-
-        // close the errors array
-        generator.writeEndArray();
-        generator.flush();
+        return allErrors;
     }
 
     /**
@@ -105,35 +83,5 @@ public class CommonAPI extends APIService {
                 .filter(type -> type != Type.UTC_DATETIME) //
                 .collect(Collectors.toList()) //
                 .toArray(new Type[0]);
-    }
-
-    /**
-     * Write the given error codes to the generator.
-     *
-     * @param generator the json generator to use.
-     * @param codes the error codes to write.
-     * @throws IOException if an error occurs.
-     */
-    private void writeErrorsFromEnum(JsonGenerator generator, ErrorCode[] codes) throws IOException {
-        for (ErrorCode code : codes) {
-            // cast to JsonErrorCode needed to ease json handling
-            JsonErrorCodeDescription description = new JsonErrorCodeDescription(code);
-            generator.writeObject(description);
-        }
-    }
-
-    /**
-     * Write the given error codes to the generator.
-     *
-     * @param generator the json generator to use.
-     * @param input the error codes to write to read from the input stream.
-     * @throws IOException if an error occurs.
-     */
-    private void writeErrorsFromApi(JsonGenerator generator, InputStream input) throws IOException {
-        Iterator<JsonErrorCodeDescription> iterator = mapper.readerFor(JsonErrorCodeDescription.class).readValues(input);
-        while (iterator.hasNext()) {
-            final JsonErrorCodeDescription description = iterator.next();
-            generator.writeObject(description);
-        }
     }
 }

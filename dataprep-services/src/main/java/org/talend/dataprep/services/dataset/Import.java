@@ -5,7 +5,6 @@ import static java.util.Collections.emptyList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.talend.dataprep.i18n.DataprepBundle;
 import org.talend.dataprep.parameters.Parameter;
 
 /**

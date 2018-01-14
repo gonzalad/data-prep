@@ -14,8 +14,6 @@ package org.talend.dataprep.util;
 
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.talend.daikon.exception.ExceptionContext.build;
-import static org.talend.dataprep.exception.error.CommonErrorCodes.ILLEGAL_ORDER_FOR_LIST;
-import static org.talend.dataprep.exception.error.CommonErrorCodes.ILLEGAL_SORT_FOR_LIST;
 
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
@@ -27,12 +25,12 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
+import org.talend.daikon.exception.TalendRuntimeException;
 import org.talend.dataprep.api.dataset.DataSetMetadata;
 import org.talend.dataprep.api.folder.Folder;
 import org.talend.dataprep.api.preparation.Preparation;
 import org.talend.dataprep.api.share.Owner;
 import org.talend.dataprep.dataset.service.UserDataSetMetadata;
-import org.talend.dataprep.exception.TDPException;
 import org.talend.dataprep.exception.error.CommonErrorCodes;
 import org.talend.dataprep.preparation.service.UserPreparation;
 
@@ -58,7 +56,6 @@ public final class SortAndOrderHelper {
 
     /**
      * How to sort things.
-     * Might be a good idea to replace by {@link org.springframework.data.domain.Sort}
      */
     public enum Sort {
         /** Name of the entity. */
@@ -128,7 +125,7 @@ public final class SortAndOrderHelper {
                     value = Sort.valueOf(text.toUpperCase());
                 } catch (IllegalArgumentException e2) {
                     LOGGER.trace("Could not read Sort parameter as snake case.", e2);
-                    throw new TDPException(CommonErrorCodes.ILLEGAL_SORT_FOR_LIST, e2);
+                    throw new TalendRuntimeException(CommonErrorCodes.ILLEGAL_SORT_FOR_LIST, e2);
                 }
             }
             setValue(value);
@@ -149,7 +146,7 @@ public final class SortAndOrderHelper {
                     value = Order.valueOf(text.toUpperCase());
                 } catch (IllegalArgumentException e2) {
                     LOGGER.trace("Could not read Order parameter as snake case.", e2);
-                    throw new TDPException(CommonErrorCodes.ILLEGAL_ORDER_FOR_LIST, e2);
+                    throw new TalendRuntimeException(CommonErrorCodes.ILLEGAL_ORDER_FOR_LIST, e2);
                 }
             }
             setValue(value);
@@ -170,7 +167,7 @@ public final class SortAndOrderHelper {
                     value = Format.valueOf(text.toUpperCase());
                 } catch (IllegalArgumentException e2) {
                     LOGGER.trace("Could not read Sort parameter as snake case.", e2);
-                    throw new TDPException(CommonErrorCodes.ILLEGAL_SORT_FOR_LIST, e2);
+                    throw new TalendRuntimeException(CommonErrorCodes.ILLEGAL_SORT_FOR_LIST, e2);
                 }
             }
             setValue(value);
@@ -221,7 +218,7 @@ public final class SortAndOrderHelper {
                 break;
             default:
                 // this should not be possible
-                throw new TDPException(CommonErrorCodes.ILLEGAL_ORDER_FOR_LIST, build().put("order", orderKey));
+                throw new TalendRuntimeException(CommonErrorCodes.ILLEGAL_ORDER_FOR_LIST, build().put("order", orderKey));
             }
         }
         return comparisonOrder;
@@ -272,7 +269,7 @@ public final class SortAndOrderHelper {
                 break;
             default:
                 // this should not be possible
-                throw new TDPException(CommonErrorCodes.ILLEGAL_SORT_FOR_LIST, build().put("sort", sortKey));
+                throw new TalendRuntimeException(CommonErrorCodes.ILLEGAL_SORT_FOR_LIST, build().put("sort", sortKey));
             }
         }
         return Comparator.comparing(keyExtractor, comparisonOrder);
@@ -338,7 +335,7 @@ public final class SortAndOrderHelper {
                 break;
             default:
                 // this should not be possible
-                throw new TDPException(CommonErrorCodes.ILLEGAL_SORT_FOR_LIST, build().put("sort", sortKey));
+                throw new TalendRuntimeException(CommonErrorCodes.ILLEGAL_SORT_FOR_LIST, build().put("sort", sortKey));
             }
         }
         return Comparator.comparing(keyExtractor, comparisonOrder);
@@ -388,7 +385,7 @@ public final class SortAndOrderHelper {
                 break;
             default:
                 // this should not be possible
-                throw new TDPException(CommonErrorCodes.ILLEGAL_SORT_FOR_LIST, build().put("sort", sortKey));
+                throw new TalendRuntimeException(CommonErrorCodes.ILLEGAL_SORT_FOR_LIST, build().put("sort", sortKey));
             }
         }
         return Comparator.comparing(keyExtractor, order);
