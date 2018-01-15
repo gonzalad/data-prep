@@ -126,6 +126,7 @@ export function PlaygroundStateService($translate,
 		setStatisticsHistogramActiveLimits: StatisticsStateService.setHistogramActiveLimits,
 		setStatisticsPatterns: StatisticsStateService.setPatterns,
 		setStatisticsFilteredPatterns: StatisticsStateService.setFilteredPatterns,
+		setStatisticsLoading: StatisticsStateService.setLoading,
 	};
 
 	//--------------------------------------------------------------------------------------------------------------

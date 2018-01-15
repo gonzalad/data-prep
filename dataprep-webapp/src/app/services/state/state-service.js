@@ -144,6 +144,7 @@ export function StateService(RouteStateService, routeState,
 		setStatisticsHistogramActiveLimits: PlaygroundStateService.setStatisticsHistogramActiveLimits,
 		setStatisticsPatterns: PlaygroundStateService.setStatisticsPatterns,
 		setStatisticsFilteredPatterns: PlaygroundStateService.setStatisticsFilteredPatterns,
+		setStatisticsLoading: PlaygroundStateService.setStatisticsLoading,
 
 		// dataset
 		startUploadingDataset: DatasetStateService.startUploadingDataset,
