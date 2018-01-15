@@ -53,7 +53,6 @@ import org.springframework.stereotype.Component;
 public class HttpClient {
 
     /** This class' logger. */
-
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpClient.class);
 
     /** Maximum connection pool size. */
